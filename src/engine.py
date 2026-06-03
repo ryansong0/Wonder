@@ -13,9 +13,15 @@ class MonteCarloEngine:
         results = []
 
         for _ in range(self.trials):
-            # simulation of a random fluctuation (e.g. tuition going up 5%)
-            simulated_cost = college.cost_of_attendance * random.uniform(0.95, 1.05)
-            results.append(simulated_cost)
+            current_debt = 0
+            annual_tuition = college.cost_of_attendance
+        
+            for year in range(4):
+                inflation_rate = random.uniform(0.02, 0.05)
+                annual_tuition *= (1 + inflation_rate)
+                current_debt += annual_tuition
+            
+        results.append(current_debt)
 
         # organize the random results into this format
         return SimulationResult(
