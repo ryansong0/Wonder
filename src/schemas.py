@@ -15,6 +15,6 @@ class StudentProfile(BaseModel):
 class CollegeData(BaseModel):
     #The data for each institution
     college_name: str
-    endowment_size: float
-    cost_of_attendance: float
+    endowment_size: float = Field(gt = 0)
+    cost_of_attendance: float = Field(gt = 0)
     average_aid_percentage: float = Field(..., ge = 0, le = 1)
