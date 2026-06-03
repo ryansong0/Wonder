@@ -8,26 +8,44 @@ class MonteCarloEngine:
     def __init__(self, trials: int = 1000):
         self.trials = trials
 
-    def run_simulation(self, college: CollegeData) -> SimulationResult:
+    def run_simulation(self, college: CollegeData, student: StudentProfile) -> SimulationResult:
         # store the cost of every trial ran
         results = []
+        shortfall_trials = 0
 
         for _ in range(self.trials):
-            current_debt = 0
+            # student initial assets
+            current_assets = student.total_assets
             annual_tuition = college.cost_of_attendance
+            trial_debt = 0
         
             for year in range(4):
+                # assets grow (about 6% every year)
+                current_assets *= (1 + random.uniform(0.04, 0.08))
+
+                # apply inflation to tuition
                 inflation_rate = random.uniform(0.02, 0.05)
                 annual_tuition *= (1 + inflation_rate)
-                current_debt += annual_tuition
-            
-        results.append(current_debt)
 
+                # pay tuition from the assets
+                if current_assets >= annual_tuition:
+                    current_assets -= annual_tuition
+                else:
+                    # calculate debt shortfall if not enough assets for tuition
+                    shortfall = annual_tuition - current_assets
+                    trial_debt += shortfall
+                    current_assets = 0
+            # count the trial as a shortfall if any debt accumulated
+            if trial_debt > 0:
+                shortfall_trials += 1
+            
+            results.append(trial_debt)
+            
         # organize the random results into this format
         return SimulationResult(
             college_name = college.college_name,
             # probability the student runs out of funds
-            probability_of_shortfall = 0.15, #current placeholder
+            probability_of_shortfall = shortfall_trials / self.trials,
             average_total_cost = sum(results) / len(results),
             max_debt = max(results), # worst case scenario
             simulation_trials = self.trials # number of trials ran
