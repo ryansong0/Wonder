@@ -1,0 +1,6 @@
+[33ma4622a6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m implemented Pydantic fieldn constraints and added automated ingestor tests
+[33mbd4a45a[m feat: implement DataIngestor to validate and process college data
+[33mb0f4955[m feat: set up project structure and initial data schemas
+[33m733cf6b[m Update README with problem statement and solution
+[33m6b184d5[m feat: setup project structure and initial api test
+[33madbdc6e[m Initial commit
