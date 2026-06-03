@@ -1,11 +1,12 @@
 import random
+from src.config import NUM_TRIALS, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX
 # rules for input data format
 from src.schemas import CollegeData
 # rules for final output
 from src.models import SimulationResult
 
 class MonteCarloEngine:
-    def __init__(self, trials: int = 1000):
+    def __init__(self, trials: int = NUM_TRIALS):
         self.trials = trials
 
     def run_simulation(self, college: CollegeData, student: StudentProfile) -> SimulationResult:
@@ -21,10 +22,10 @@ class MonteCarloEngine:
         
             for year in range(4):
                 # assets grow (about 6% every year)
-                current_assets *= (1 + random.uniform(0.04, 0.08))
+                current_assets *= (1 + random.uniform(MARKET_RETURN_MIN, MARKET_RETURN_MAX))
 
                 # apply inflation to tuition
-                inflation_rate = random.uniform(0.02, 0.05)
+                inflation_rate = random.uniform(INFLATION_MIN, INFLATION_MAX)
                 annual_tuition *= (1 + inflation_rate)
 
                 # pay tuition from the assets

@@ -17,7 +17,7 @@ def load_college_data(file_path: str) -> list[CollegeData]:
             endowment_size = None
         # create a CollegeData object for every row
         college = CollegeData(
-            college_name = row['college_name'].
+            college_name = row['college_name'],
             cost_of_attendance = float(row['cost_of_attendance']),
         )
         colleges.append(college)
