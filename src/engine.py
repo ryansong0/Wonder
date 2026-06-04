@@ -1,7 +1,7 @@
 import random
 from src.config import NUM_TRIALS, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX
 # rules for input data format
-from src.schemas import CollegeData
+from src.schemas import CollegeData, StudentProfile
 # rules for final output
 from src.models import SimulationResult
 

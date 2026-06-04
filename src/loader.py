@@ -4,6 +4,8 @@ from src.schemas import CollegeData
 def load_college_data(file_path: str) -> list[CollegeData]:
     # read the csv file into a pandas DataFrame
     df = pd.read_csv(file_path)
+    df = pd.read_csv(file_path)
+    df.columns = df.columns.str.strip()
     colleges = []
 
     # iterate through each row in csv file
