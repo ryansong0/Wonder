@@ -6,15 +6,18 @@ In today's age, where private institutions' annual cost of attendance can range 
 ### The Solution
 This project provides a centralized financial aid engine that eliminates the redundant data entry process that is currently ongoing. Creating a unified ingestion layer and a high-throughput modeling framework, my system simultaneously generates stochastic financial aid projections for 100+ institutions. This replaces a manual, multi-step workflow with a single, optimized user interaction. Additionally, instead of providing a single (and often misleading) estimation value, my engine uses Monte Carlo simulations to present a range of probable values, providing a more transparent view of potential net costs for each university. My hope is that students and parents can avoid wasting their time inputting their information repeatedly for each school (which is something that I had to do during my senior year of high school, as I applied to 15+ schools), and can instead use my project as a resource to be more time-efficient during the college application season!
 
-## Performance & Scalability
-The engine leverages **NumPy vectorization** to bypass Python's iterative overhead, allowing for high-throughput Monte Carlo analysis.
+## Performance 
+The project uses NumPy vectorization to process simulation trials in batches at the same time, which allows the system to scale 1,000,000+ trials fast.
 
-| Metric | Result |
-| :--- | :--- |
-| **Execution Latency (10k trials)** | ~0.013s |
-| **Throughput** | ~775,000 sims/sec |
+## Results
+The tests were performed using an optimized vector-based execution model.
 
-*Optimization: Transitioned from iterative O(N*Y) loops to vectorized matrix operations, achieving a >50x performance improvement over baseline models.*
+| Simulation Trials | Processing Time | Throughput |
+| :--- | :--- | :--- |
+| 10,000 | 0.042s | 238,000 trials/sec |
+| 100,000 | 0.058s | 1,724,000 trials/sec |
+| 1,000,000 | 0.412s | 2,427,000 trials/sec |
+
 
 ### How to Run
 1. **Prepare your data:** Ensure your 'colleges.csv' is in the 'data/' folder.
