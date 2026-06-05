@@ -4,10 +4,22 @@ from src.engine import MonteCarloEngine
 
 def get_user_input():
     print("--- Financial Aid Profile ---")
-    income= float(input("Enter your annual household income: "))
-    assets = float(input("Enter total household assets: "))
-    size = int(input("Enter number of people in family: "))
-    state = input("Enter your state of residence (e.g., NC): ")
+    try:
+        income= float(input("Enter your annual household income: "))
+    except ValueError:
+        print("Please enter a valid number.")
+    try:
+        assets = float(input("Enter total household assets: "))
+    except ValueError:
+        print("Please enter a valid number.")
+    try:
+        size = int(input("Enter number of people in family: "))
+    except ValueError:
+        print("Please enter a valid number.")
+    try:
+        state = input("Enter your state of residence (e.g., NC): ")
+    except ValueError:
+        print("Please enter a valid number.")
     return StudentProfile(household_income = income, total_assets = assets, family_size = size, state_of_residence = state)
 
 def get_average_cost(result):

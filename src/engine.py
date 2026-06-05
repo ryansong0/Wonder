@@ -1,5 +1,5 @@
 import random
-from src.config import NUM_TRIALS, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX
+from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX, INCOME_WEIGHT, ASSET_WEIGHT
 # rules for input data format
 from src.schemas import CollegeData, StudentProfile
 # rules for final output
@@ -15,7 +15,7 @@ class MonteCarloEngine:
         shortfall_trials = 0
 
         # calculate Expected Family Contribution (EFC)
-        efc = (student.household_income * 0.10) + (student.total_assets * 0.05)
+        efc = (student.household_income * INCOME_WEIGHT) + (student.total_assets * ASSET_WEIGHT)
 
         # determine financial need
         need = college.cost_of_attendance - efc
@@ -26,7 +26,7 @@ class MonteCarloEngine:
             annual_tuition = college.cost_of_attendance
             trial_debt = 0
         
-            for year in range(4):
+            for year in range(YEARS_OF_COLLEGE):
                 # assets grow (about 6% every year)
                 current_assets *= (1 + random.uniform(MARKET_RETURN_MIN, MARKET_RETURN_MAX))
 
