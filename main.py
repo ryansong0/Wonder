@@ -14,6 +14,21 @@ def get_user_input():
         except ValueError:
             print("Invalid input. Please enter a numeric value.")
 
+def get_cost_risk_balance(results):
+    """
+    Returns a college that is both cheaper and has a lower probability of shortfall than another college. It is considered 'dominated'.
+    """
+    balance = []
+    for college in results:
+        is_dominated = False
+        for college_list in results:
+            if (college_list.average_total_cost <= college.average_total_cost and college_list.probability_of_shortfall <= college.probability_of_shortfall and college != college_list):
+                is_dominated = True
+                break
+        if not is_dominated:
+            balance.append(college)
+    return balance
+
 
 def get_average_cost(result):
     return result.average_total_cost
@@ -44,6 +59,11 @@ def main():
         cheapest_college = min(results_list, key = get_average_cost)
         print(f"Based on your profile, {cheapest_college.college_name} is your most affordable option.")
         print(f"Expected average debt: ${cheapest_college.average_total_cost:,.2f}")
+
+    print("\n--- Best Risk/Reward Options) ---")
+    optimal_risk_reward = get_cost_risk_balance(results_list)
+    for college in optimal_risk_reward:
+        print(f"{college.college_name:<30} | Cost: ${college.average_total_cost:>12,.0f} | Risk: {college.probability_of_shortfall:>6.1%}")
 
 
 if __name__ == "__main__":
