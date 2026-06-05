@@ -14,6 +14,12 @@ class MonteCarloEngine:
         results = []
         shortfall_trials = 0
 
+        # calculate Expected Family Contribution (EFC)
+        efc = (student.household_income * 0.10) + (student.total_assets * 0.05)
+
+        # determine financial need
+        need = college.cost_of_attendance - efc
+
         for _ in range(self.trials):
             # student initial assets
             current_assets = student.total_assets
@@ -27,6 +33,9 @@ class MonteCarloEngine:
                 # apply inflation to tuition
                 inflation_rate = random.uniform(INFLATION_MIN, INFLATION_MAX)
                 annual_tuition *= (1 + inflation_rate)
+
+                # this line ensures aid is applied to inflated tuition
+                net_tuition = annual_tuition * (1 - (college.average_aid_percentage or 0))
 
                 # pay tuition from the assets
                 if current_assets >= annual_tuition:
