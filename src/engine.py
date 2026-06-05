@@ -11,62 +11,41 @@ class MonteCarloEngine:
         self.trials = trials
 
     def run_simulation(self, college: CollegeData, student: StudentProfile) -> SimulationResult:
-        # store the cost of every trial ran
-        results = []
-        shortfall_trials = 0
+        # creating random values for every trial
+        market_returns = np.random.uniform(MARKET_RETURN_MIN, MARKET_RETURN_MAX, (self.trials, YEARS_OF_COLLEGE))
+        inflation_rates = np.random.uniform(INFLATION_MIN, INFLATION_MAX, (self.trials, YEARS_OF_COLLEGE))
 
-        # calculate Expected Family Contribution (EFC)
-        efc = (student.household_income * INCOME_WEIGHT) + (student.total_assets * ASSET_WEIGHT)
+        assets = np.full(self.trials, student.total_assets, dtype = float)
 
-        # determine financial need
-        need = college.cost_of_attendance - efc
-
-        for _ in range(self.trials):
-            # student initial assets
-            current_assets = student.total_assets
-            annual_tuition = college.cost_of_attendance
-            trial_debt = 0
+        # net tuition after aid
+        net_tuition_annual = college.cost_of_attendance * (1 - (college.average_aid_percentage or 0))
         
-            for year in range(YEARS_OF_COLLEGE):
-                # assets grow (about 6% every year)
-                current_assets *= (1 + random.uniform(MARKET_RETURN_MIN, MARKET_RETURN_MAX))
+        # tracking total debt accumulated per trial
+        total_debt = np.zeros(self.trials)
 
-                # apply inflation to tuition
-                inflation_rate = random.uniform(INFLATION_MIN, INFLATION_MAX)
-                annual_tuition *= (1 + inflation_rate)
+        
+        for year in range(YEARS_OF_COLLEGE):
+                # assets grow for all trials
+                assets *= (1 + market_returns[:, year])
 
-                # this line ensures aid is applied to inflated tuition
-                net_tuition = annual_tuition * (1 - (college.average_aid_percentage or 0))
+                # inflate tuition for this year
+                current_tuition = net_tuition_annual * np.prod(1 + inflation_rates[:, :year + 1], axis = 1)
 
-                # pay tuition from the assets
-                if current_assets >= annual_tuition:
-                    current_assets -= annual_tuition
-                else:
-                    # calculate debt shortfall if not enough assets for tuition
-                    shortfall = annual_tuition - current_assets
-                    trial_debt += shortfall
-                    current_assets = 0
-            # count the trial as a shortfall if any debt accumulated
-            if trial_debt > 0:
-                shortfall_trials += 1
-            
-            results.append(trial_debt)
+                # calculate shortfall for all trials simultaneously
+                shortfall = np.maximum(0, current_tuition - assets)
+                total_debt += shortfall
 
-        # Converts results to a numpy array for statistical calculations
-        results_array = np.array(results)
-
-        # Calculate the 5th and 95th percentile
-        p05 = np.percentile(results_array, 5)
-        p95 = np.percentile(results_array, 95)
+                # deduct from assets (note: not below zero)
+                assets = np.maximum(0, assets - current_tuition)
             
         # organize the random results into this format
         return SimulationResult(
             college_name = college.college_name,
             # probability the student runs out of funds
-            probability_of_shortfall = shortfall_trials / self.trials,
-            average_total_cost = sum(results) / len(results),
-            max_debt = max(results), # worst case scenario
-            percentile_05 = p05,
-            percentile_95 = p95,
+            probability_of_shortfall = np.mean(total_debt > 0),
+            average_total_cost = np.mean(total_debt),
+            max_debt = np.max(total_debt), # worst case scenario
+            percentile_05 = np.percentile(total_debt, 5),
+            percentile_95 = np.percentile(total_debt, 95),
             simulation_trials = self.trials # number of trials ran
         )

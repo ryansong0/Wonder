@@ -1,6 +1,9 @@
+import time
+
 from src.loader import load_college_data
 from src.schemas import CollegeData, StudentProfile
 from src.engine import MonteCarloEngine
+
 
 def get_user_input():
     print("--- Financial Aid Profile ---")
@@ -44,6 +47,14 @@ def main():
         return
     current_student = get_user_input()
     engine = MonteCarloEngine(trials = 1000)
+
+    # time how long this process takes
+    start_time = time.perf_counter()
+    for college in college_list:
+        result = engine.run_simulation(college, current_student)
+        results_list.append(result)
+    end_time = time.perf_counter()
+    print(f"Total processing time: {end_time - start_time:.4f} seconds")
 
     print(f"{'College Name':<30} | {'Shortfall Prob':<15} | {'Avg Debt'}")
     print("-" * 60)
