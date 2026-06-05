@@ -1,4 +1,5 @@
 import random
+import numpy as np  
 from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX, INCOME_WEIGHT, ASSET_WEIGHT
 # rules for input data format
 from src.schemas import CollegeData, StudentProfile
@@ -50,6 +51,13 @@ class MonteCarloEngine:
                 shortfall_trials += 1
             
             results.append(trial_debt)
+
+        # Converts results to a numpy array for statistical calculations
+        results_array = np.array(results)
+
+        # Calculate the 5th and 95th percentile
+        p05 = np.percentile(results_array, 5)
+        p95 = np.percentile(results_array, 95)
             
         # organize the random results into this format
         return SimulationResult(
@@ -58,5 +66,7 @@ class MonteCarloEngine:
             probability_of_shortfall = shortfall_trials / self.trials,
             average_total_cost = sum(results) / len(results),
             max_debt = max(results), # worst case scenario
+            percentile_05 = p05,
+            percentile_95 = p95,
             simulation_trials = self.trials # number of trials ran
         )
