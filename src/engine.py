@@ -15,6 +15,9 @@ class MonteCarloEngine:
         market_returns = np.random.uniform(MARKET_RETURN_MIN, MARKET_RETURN_MAX, (self.trials, YEARS_OF_COLLEGE))
         inflation_rates = np.random.uniform(INFLATION_MIN, INFLATION_MAX, (self.trials, YEARS_OF_COLLEGE))
 
+        # pre-calculate cumulative inflation multipliers for all years
+        inflation_multipliers = np.cumprod(1 + inflation_rates, axis = 1)
+
         assets = np.full(self.trials, student.total_assets, dtype = float)
 
         # net tuition after aid
