@@ -10,6 +10,8 @@ def get_user_input():
     state = input("Enter your state of residence (e.g., NC): ")
     return StudentProfile(household_income = income, total_assets = assets, family_size = size, state_of_residence = state)
 
+def get_average_cost(result):
+    return result.average_total_cost
 
 def main():
     try:
@@ -26,9 +28,18 @@ def main():
     print(f"{'College Name':<30} | {'Shortfall Prob':<15} | {'Avg Debt'}")
     print("-" * 60)
 
+    results_list = []
     for college in college_list:
         result = engine.run_simulation(college, current_student)
+        results_list.append(result)
         print(f"{result.college_name:<30} | {result.probability_of_shortfall * 100:>13.1f}% | ${result.average_total_cost:>12,.2f}")
+
+    print("\n--- Summary ---")
+    if results_list:
+        cheapest_college = min(results_list, key = get_average_cost)
+        print(f"Based on your profile, {cheapest_college.college_name} is your most affordable option.")
+        print(f"Expected average debt: ${cheapest_college.average_total_cost:,.2f}")
+
 
 if __name__ == "__main__":
     main()
