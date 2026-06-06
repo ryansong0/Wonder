@@ -4,7 +4,7 @@ from src.engine import MonteCarloEngine
 
 def main():
     try:
-        college_list = load_college_data('data/colleges.csv')
+        college_list = load_college_data('colleges.csv')
     except FileNotFoundError:
         print("Error: Could not find 'data/colleges.csv'. Please make sure that the file exists.")
         return

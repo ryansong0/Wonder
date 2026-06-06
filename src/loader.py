@@ -1,7 +1,16 @@
 import pandas as pd
+from pathlib import Path
 from src.schemas import CollegeData
 
-def load_college_data(file_path: str) -> list[CollegeData]:
+def load_college_data(file_name: str = 'colleges.csv') -> list[CollegeData]:
+    # __file__ is the current file
+    # .parent.parent moves up to the project root directory
+    base_dir = Path(__file__).resolve().parent.parent
+    file_path = base_dir / "data" / file_name
+
+    if not file_path.exists():
+        raise FileNotFoundError(f"Could not find the data file at: {file_path}")
+    
     # read the csv file into a pandas DataFrame
     df = pd.read_csv(file_path)
     df = pd.read_csv(file_path)
