@@ -21,7 +21,7 @@ class MonteCarloEngine:
         assets = np.full(self.trials, student.total_assets, dtype = float)
 
         # net tuition after aid
-        net_tuition_annual = college.cost_of_attendance * (1 - (college.average_aid_percentage or 0))
+        net_tuition_annual = self.calculate_net_price(student, college)
         
         # tracking total debt accumulated per trial
         total_debt = np.zeros(self.trials)
@@ -63,7 +63,7 @@ class MonteCarloEngine:
         # Need-Based Aid
         else:
             # Federal Methodology approximation for Family Contribution
-             efc = (student.household_income * 0.15) (student.total_assets * 0.05)
+             efc = (student.household_income * 0.15) + (student.total_assets * 0.05)
              need = max(0, college.cost_of_attendance - efc)
 
              # applying a college's specific aid generosity factor

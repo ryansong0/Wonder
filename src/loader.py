@@ -22,17 +22,13 @@ def load_college_data(file_name: str = 'colleges.csv') -> list[CollegeData]:
 
     # iterate through each row in csv file
     for _, row in df.iterrows():
-        # extract raw value
-        raw_value = row.get('endowment_size')
-        # convert to float if data exists
-        if raw_value:
-            endowment_size = float(raw_value)
-        else:
-            endowment_size = None
-        # create a CollegeData object for every row
-        college = CollegeData(
-            college_name = row['college_name'],
-            cost_of_attendance = float(row['cost_of_attendance']),
-        )
+        # captures every column header in csv file
+        row_dict = row.to_dict()
+
+        # replaces empty cells with "None"
+        clean_data = {k: (None if pd.isna(v) else v) for k, v in row_dict.items()}
+
+        college = CollegeData(**clean_data)
+        
         colleges.append(college)
     return colleges
