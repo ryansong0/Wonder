@@ -15,6 +15,16 @@ def plot_visual(college: CollegeData, student: StudentProfile):
 
     # title
     plt.title(f"Projected Unmet Financial Need: {college.college_name}", fontsize = 14)
+    plt.xlabel("Total Unmet Need at Graduation ($)", fontsize = 12)
+    plt.ylabel("Frequency (Number of SImulations)", fontsize = 12)
+    plt.grid(axis = 'y', linestyle = '--', alpha = 0.7)
+
+    # mean line to represent the "Expected" financial gap
+    mean_val = np.mean(results)
+    plt.axvline(mean_val, color = 'red', linestyle = 'dashed', linewidth = 2, label = f"Expected Unmet Need: ${mean_val:,.0f}")
+    plt.legend()
+
+    plt.show()
 
 if __name__ == "__main__":
     my_college = CollegeData(
