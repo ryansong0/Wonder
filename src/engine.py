@@ -53,7 +53,7 @@ class MonteCarloEngine:
             simulation_trials = self.trials # number of trials ran
         )
     
-    def calculate_net_price(student: StudentProfile, college: CollegeData) -> float:
+    def calculate_net_price(self, student: StudentProfile, college: CollegeData) -> float:
         """Calculates the expected cost after applying the college's specific financial aid policy."""
         # Tuition-Free Policy
         # in this model, if a student is below the threshold, the student pays $0 tuition
