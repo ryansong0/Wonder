@@ -52,3 +52,21 @@ class MonteCarloEngine:
             percentile_95 = np.percentile(total_debt, 95),
             simulation_trials = self.trials # number of trials ran
         )
+    
+    def calculate_net_price(student: StudentProfile, college: CollegeData) -> float:
+        """Calculates the expected cost after applying the college's specific financial aid policy."""
+        # Tuition-Free Policy
+        # in this model, if a student is below the threshold, the student pays $0 tuition
+        if student.household_income <= college.tuition_free_threshold:
+              # assuming that there are still basic fees (about 5% of Cost of Attendance)
+              return college.cost_of_attendance * 0.05
+        # Need-Based Aid
+        else:
+            # Federal Methodology approximation for Family Contribution
+             efc = (student.household_income * 0.15) (student.total_assets * 0.05)
+             need = max(0, college.cost_of_attendance - efc)
+
+             # applying a college's specific aid generosity factor
+             aid = need * (college.average_aid_percentage or 0.0)
+             return max(0, college.cost_of_attendance - aid)
+          
