@@ -1,0 +1,14 @@
+{
+    "simulation": {
+        "trials": 1000,
+        "years_of_college": 4,
+        "market_return_min": 0.04,
+        "market_return_max": 0.08,
+        "inflation_min": 0.02,
+        "inflation_max": 0.05
+    },
+    "weights": {
+        "income_weight": 0.10,
+        "asset_weight": 0.05
+    }
+}
