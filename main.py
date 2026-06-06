@@ -1,3 +1,4 @@
+import logging
 from src.loader import load_college_data
 from src.schemas import CollegeData, StudentProfile
 from src.engine import MonteCarloEngine
@@ -35,15 +36,26 @@ def get_average_cost(result):
     return result.average_total_cost
 
 def main():
+    # configure logging immediately
+    logging.basicConfig(
+        level = logging.INFO,
+        filename = 'simulation.log',
+        filemode = 'w',
+        format = '%(asctime)s - %(levelname)s - %(message)s'
+    )
+
+    logging.info("System initializing...")
+
     try:
         college_list = load_college_data('colleges.csv')
     except FileNotFoundError:
         print("Error: Could not find 'data/colleges.csv'. Please make sure that the file exists.")
         return
     except Exception as e:
-        print(f"An unexpected error occurred while loading data: {e}")
+        logging.critical(f"Data loading failed: {e}")
+        print(f"An unexpected error occurred while loading data. Check 'simulation.log' for details.")
         return
-    
+        
     current_student = get_user_input()
     engine = MonteCarloEngine(trials = 1000)
 
@@ -66,6 +78,7 @@ def main():
     for college in optimal_risk_reward:
         print(f"{college.college_name:<30} | Cost: ${college.average_total_cost:>12,.0f} | Risk: {college.probability_of_shortfall:>6.1%}")
 
+    logging.info("Simulation completed successfully.")
 
 if __name__ == "__main__":
     main()
