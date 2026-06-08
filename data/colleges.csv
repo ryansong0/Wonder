@@ -1,0 +1,8 @@
+college_name,cost_of_attendance,tuition_free_threshold,average_aid_percentage,endowment_size
+Harvard University,87000,100000,0.95,55000000000
+Duke University,98800,100000,0.92,10000000000
+Yale University,94500,75000,0.93,44000000000
+MIT,89500,90000,0.94,25000000000
+Stanford University,89000,150000,0.94,40800000000
+Princeton University,92000,250000,0.96,36000000000
+University of Pennsylvania,91000,200000,0.93,25000000000
