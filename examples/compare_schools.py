@@ -24,5 +24,12 @@ def compare_situations():
     ivy_result = engine.run_simulation(ivy_league, student)
     public_result = engine.run_simulation(public_school, student)
 
+
+    print(f"Comparison Results for Student Household Income: ${student.household_income}")
+    print("-" * 50)
+    print(f"{'Instutition':<20} | {'Expected Unmet Need':<20}")
+    print(f"{ivy_league.college_name:<20} | ${ivy_result.average_total_cost:.2f}")
+    print(f"{public_school.college_name:<20} | ${public_result.average_total_cost:,.2f}")
+
     if __name__ == "__main__":
         compare_situations()
