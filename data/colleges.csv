@@ -47,6 +47,8 @@ University of Illinois Urbana-Champaign,60000,75000,0.75,3500000000
 Tufts University,84000,100000,0.88,2500000000
 Bowdoin College,82000,150000,0.96,2000000000
 Colby College, 82000,150000,0.95,1500000000
+Barnard College,99000,100000,0.33,500000000
+University of California Los Angeles,79000,100000,0.60,5000000000
 Davidson College,80000,100000,0.90,1200000000
 Colgate University,80000,150000,0.90,1200000000
 Rochester University,82000,75000,0.75,2300000000
@@ -87,5 +89,13 @@ University of Connecticut,58000,80000,0.61,650000000
 University of Utah,51000,75000,0.50,1500000000
 Syracuse University,88000,80000,0.70,2000000000
 University of Alabama,50000,75000,0.60,1000000000
-Gonzaga University,75000,75000,0.75,1000000000
+Gonzaga University,75000,75000,0.75,500000000
+Clemson University,55000,75000,0.65,1100000000
+University of Vermont,60000,75000,0.60,1000000000
+Pepperdine University,82000,80000,0.75,1000000000
+North Carolina State University,52000,75000,0.65,2500000000
+University of Kentucky,38000,70000,0.65,2000000000
+University of Missouri,30000,65000,0.60,2500000000
+University of Mississippi,33000,60000,0.73,1000000000
+University of Cincinnati,25000,65000,0.60,1900000000
 
