@@ -20,7 +20,7 @@ University of Virginia,70000,100000,0.85,11000000000
 Rice University,80000,140000,0.90,8500000000
 UNC Chapel Hill,60000,80000,0.85,6200000000
 University of Chicago,93000,125000,0.91,10600000000
-University of Southern Carolina,88000,80000,0.85,9000000000
+University of Southern California,88000,80000,0.85,9000000000
 Dartmouth College,90000,125000,0.92,9000000000
 Brown University,88000,125000,0.92,7300000000
 New York University,92000,100000,0.80,7300000000
@@ -60,5 +60,17 @@ Tulane University,83000,80000,0.75,18000000000
 Georgetown University,86000,125000,0.85,3000000000
 Wake Forest University,82000,100000,0.75,1900000000
 University of Maryland,55000,75000,0.70,2000000000
-
+Case Western Reserve University,81000,80000,0.75,2200000000
+Lehigh University,80000,80000,0.75,1500000000
+Harvey Mudd College,85000,100000,0.90,1000000000
+Ohio State University,60000,80000,0.70,7500000000
+Purdue University,55000,75000,0.65,4000000000
+University of Georgia,55000,75000,0.70,2200000000
+University of Colorado Boulder,65000,80000,0.60,2800000000
+University of Arizona,60000,75000,0.60,1500000000
+University of Iowa,55000,75000,0.60,2100000000
+Arizona State University,55000,75000,0.65,1100000000
+Texas A&M University,55000,80000,0.65,1800000000
+University of Nebraska Lincoln,55000,70000,0.60,2000000000
+Rutgers University,65000,100000,0.70,1500000000
 
