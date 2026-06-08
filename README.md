@@ -19,10 +19,11 @@ The tests were performed using an optimized vector-based execution model.
 | 1,000,000 | 0.412s | 2,427,000 trials/sec |
 
 
-### How to Run
-1. **Prepare your data:** Ensure your 'colleges.csv' is in the 'data/' folder.
-2. **Setup environment:** Open your terminal in the project directory and run:
+### Getting Started
 
+#### 1. Setup Environment
+
+First, clone the repository and set up the virtual environment:
 ```bash
 # Create and activate the environment
 python -m venv venv
@@ -33,8 +34,11 @@ venv\Scripts\activate
 # For macOS/Linux:
 source venv/bin/activate
 
-# Instal requirements
-pip install pydantic
+# Install
+pip install -r requirements.txt
+```
+#### 2. Run Simulation:
+python scripts/plot_results.py
 
-# Run the simulation
-python main.py
+#### 3. Run Test:
+pytest
