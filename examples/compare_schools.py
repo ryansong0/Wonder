@@ -1,3 +1,14 @@
+import sys
+import os
+from pathlib import Path
+
+# force output to show up immediately
+sys.stdout.reconfigure(line_buffering=True)
+
+# add the root to path
+project_root = str(Path(__file__).resolve().parent.parent)
+sys.path.insert(0, project_root)
+
 from src.engine import MonteCarloEngine
 from src.schemas import StudentProfile, CollegeData
 
@@ -31,5 +42,5 @@ def compare_situations():
     print(f"{ivy_league.college_name:<20} | ${ivy_result.average_total_cost:.2f}")
     print(f"{public_school.college_name:<20} | ${public_result.average_total_cost:,.2f}")
 
-    if __name__ == "__main__":
-        compare_situations()
+if __name__ == "__main__":
+    compare_situations()
