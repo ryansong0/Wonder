@@ -9,6 +9,7 @@ University of Pennsylvania,91000,200000,0.93,25000000000
 Columbia University,92500,150000,0.92,16000000000
 Johns Hopkins University,89000,150000,0.91,13700000000
 University of Michigan,75000,125000,0.88,21000000000
+California Institute of Technology,88000,125000,0.94,4500000000
 Northwestern University,90000,150000,0.92,15000000000
 University of Notre Dame,88000,100000,0.90,20000000000
 Washington University in St. Louis,91000,75000,0.90,13300000000
@@ -37,10 +38,27 @@ Carnegine Mellon University,86000,100000,0.85,2000000000
 Georgia Tech,55000,75000,0.75,2200000000
 Boston University,85000,80000,0.70,2400000000
 Boston College,84000,80000,0.75,2600000000
+University of Florida,45000,70000,0.65,2800000000
+University of California Berkeley,70000,100000,0.80,7000000000
+University of California San Diego,68000,100000,0.80,2000000000
+University of California Irvine,67000,100000,0.801500000000
+University of California Davis,67000,100000,0.80,2000000000
+University of Illinois Urbana-Champaign,60000,75000,0.75,3500000000
 Tufts University,84000,100000,0.88,2500000000
 Bowdoin College,82000,150000,0.96,2000000000
 Colby College, 82000,150000,0.95,1500000000
 Davidson College,80000,100000,0.90,1200000000
 Colgate University,80000,150000,0.90,1200000000
+Rochester University,82000,75000,0.75,2300000000
+University of Richmond,75000,80000,0.75,2400000000
+Skidmore College,76000,75000,0.65,500000000
+Lafayette College,78000,75000,0.75,1000000000
+Middlebury College,82000,150000,0.93,16000000000
+Haverford College,80000,125000,0.93,7000000000
+Vassar College,79000,100000,0.90,12000000000
+Tulane University,83000,80000,0.75,18000000000
+Georgetown University,86000,125000,0.85,3000000000
+Wake Forest University,82000,100000,0.75,1900000000
+University of Maryland,55000,75000,0.70,2000000000
 
 
