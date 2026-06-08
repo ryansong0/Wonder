@@ -50,7 +50,8 @@ class MonteCarloEngine:
             max_debt = np.max(total_debt), # worst case scenario
             percentile_05 = np.percentile(total_debt, 5),
             percentile_95 = np.percentile(total_debt, 95),
-            simulation_trials = self.trials # number of trials ran
+            simulation_trials = self.trials, # number of trials ran
+            all_trial_results = total_debt
         )
     
     def calculate_net_price(self, student: StudentProfile, college: CollegeData) -> float:
