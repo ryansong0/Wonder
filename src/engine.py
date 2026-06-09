@@ -1,5 +1,5 @@
-import random
 import numpy as np  
+import functools
 from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX, INCOME_WEIGHT, ASSET_WEIGHT
 # rules for input data format
 from src.schemas import CollegeData, StudentProfile
@@ -9,14 +9,14 @@ from src.models import SimulationResult
 class MonteCarloEngine:
     def __init__(self, trials: int = NUM_TRIALS):
         self.trials = trials
+        self.run_simulation = functools.lru_cache(maxsize = 128)(self._run_simulation)
 
-    def run_simulation(self, college: CollegeData, student: StudentProfile) -> SimulationResult:
-        # creating random values for every trial
-        market_returns = np.random.uniform(MARKET_RETURN_MIN, MARKET_RETURN_MAX, (self.trials, YEARS_OF_COLLEGE))
+    def _run_simulation(self, college: CollegeData, student: StudentProfile) -> SimulationResult:
+        mu, sigma = 0.07, 0.15
+        log_returns = np.random.normal(mu, sigma, (self.trials, YEARS_OF_COLLEGE))
+        market_returns = np.exp(log_returns) - 1
+
         inflation_rates = np.random.uniform(INFLATION_MIN, INFLATION_MAX, (self.trials, YEARS_OF_COLLEGE))
-
-        # pre-calculate cumulative inflation multipliers for all years
-        inflation_multipliers = np.cumprod(1 + inflation_rates, axis = 1)
 
         assets = np.full(self.trials, student.total_assets, dtype = float)
 
@@ -30,9 +30,12 @@ class MonteCarloEngine:
         for year in range(YEARS_OF_COLLEGE):
                 # assets grow for all trials
                 assets *= (1 + market_returns[:, year])
+                
+                # add cumulative inflation to base tuition
+                inflation_multiplier = np.prod(1 + inflation_rates[:, :year + 1], axis = 1)
 
                 # inflate tuition for this year
-                current_tuition = net_tuition_annual * np.prod(1 + inflation_rates[:, :year + 1], axis = 1)
+                current_tuition = net_tuition_annual * inflation_multiplier
 
                 # calculate shortfall for all trials simultaneously
                 shortfall = np.maximum(0, current_tuition - assets)
@@ -62,12 +65,11 @@ class MonteCarloEngine:
               # assuming that there are still basic fees (about 5% of Cost of Attendance)
               return college.cost_of_attendance * 0.05
         # Need-Based Aid
-        else:
-            # Federal Methodology approximation for Family Contribution
-             efc = (student.household_income * 0.15) + (student.total_assets * 0.05)
-             need = max(0, college.cost_of_attendance - efc)
+        # Federal Methodology approximation for Family Contribution
+        efc = (student.household_income * 0.15) + (student.total_assets * 0.05)
+        need = max(0, college.cost_of_attendance - efc)
 
-             # applying a college's specific aid generosity factor
-             aid = need * (college.average_aid_percentage or 0.0)
-             return max(0, college.cost_of_attendance - aid)
+        # applying a college's specific aid generosity factor
+        aid = need * (college.average_aid_percentage or 0.0)
+        return max(0, college.cost_of_attendance - aid)
           
