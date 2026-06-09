@@ -27,3 +27,6 @@ if st.button("Run Simulation"):
         family_size = family_size,
         state_of_residence = state
     )
+
+    engine = MonteCarloEngine(trials = 1000)
+    result = engine.run_simulation(chosen_college, student)
