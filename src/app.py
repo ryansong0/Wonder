@@ -8,7 +8,12 @@ from src.loader import load_college_data
 st.set_page_config(page_title = "Financial Aid Simulation", layout = "wide")
 st.title("College Financial Aid Simulator")
 
-colleges = load_college_data('colleges.csv')
+def load_data_logic():
+    return load_college_data('colleges.csv')
+
+get_colleges = st.cache_data(load_data_logic)
+
+colleges = get_colleges()
 college_names = [c.college_name for c in colleges]
 
 st.sidebar.header("Student Profile")
