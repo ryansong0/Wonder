@@ -30,3 +30,9 @@ if st.button("Run Simulation"):
 
     engine = MonteCarloEngine(trials = 1000)
     result = engine.run_simulation(chosen_college, student)
+
+    fig, ax = plt.subplots()
+    ax.hist(result.all_trial_results, bins = 50, color = 'skyblue', edgecolor = 'black')
+    ax.set_title(f"Projected Unmet Aid Need: {chosen_college.college_name}")
+    ax.set_xlabel("Dollars ($)")
+    ax.set_ylabel("Frequency")
