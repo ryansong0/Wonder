@@ -10,3 +10,9 @@ st.title("College Financial Aid Simulator")
 
 colleges = load_college_data('colleges.csv')
 colleges_names = [c.college_name for c in colleges]
+
+st.sidebar.header("Student Profile")
+income = st.sidebar.number_input("Household Income ($)")
+assets = st.sidebar.number_input("Total Assets ($)")
+family_size = st.sidebar.slider("Family Size")
+state = st.sidebar.text_input("State", "NC")
