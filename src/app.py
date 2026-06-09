@@ -31,8 +31,13 @@ if st.button("Run Simulation"):
     engine = MonteCarloEngine(trials = 1000)
     result = engine.run_simulation(chosen_college, student)
 
+    col1, col2 = st.columns(2)
+    col1.metric("Average Unmet Need", f"{result.average_total_cost:,.2f}")
+    col2.metric("Probability of Shortfall", f"{result.probability_of_shortfall:.1%}")
+
     fig, ax = plt.subplots()
     ax.hist(result.all_trial_results, bins = 50, color = 'skyblue', edgecolor = 'black')
-    ax.set_title(f"Projected Unmet Aid Need: {chosen_college.college_name}")
+    ax.set_title(f"Projected Unmet Need: {chosen_college.college_name}")
     ax.set_xlabel("Dollars ($)")
     ax.set_ylabel("Frequency")
+    st.pyplot(fig)
