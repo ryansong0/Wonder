@@ -1,4 +1,4 @@
-# Stochastic College Financial Aid Engine
+# Wonder
 
 ### The Problem
 In today's age, where private institutions' annual cost of attendance can range to upwards of $100,000 annually, students and parents face significant financial uncertainty. Currently, colleges have their own independent cost of attendance calculators that force students to re-input their financial profiles for every potential college to predict their aid at each school. For instance, if a student planed to apply to 17 schools, that student would need to plug in his/her information in all 17 college calculators to see how much the cost of attendance would be at each school. This time-consuming and repetitive process should not be what students worry about. Rather, they should be spending their time focusing on their critical college applications. As financial aid is determined by a combination of the institution's endowment size for its available funding for scholarships and grants, as well historical enrollment and aid-required data for an estimation to the incoming class, each college's aid package varies greatly from each other, which can make static estimates misleading.
