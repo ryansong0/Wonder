@@ -6,18 +6,11 @@ from typing import Optional
 class StudentProfile(BaseModel):
     #The data a user enters once.
     #... means a value must be provided, which is greater than 0
-    household_income: float = Field(..., gt = 0)
-    total_assets: float = Field(..., ge = 0) #ge=0 (greater than or equal to 0)
-    family_size: int = Field(..., gt = 0)
-    #gt=0 (greater than 0) ensures the code rejects any nonsensical data (like a negative income)
-    state_of_residence: str
+    household_income: float
+    assets: Optional[float] = 0
+    size: Optional[int] = 4
+    state: Optional[str] = "AK"
 
 class CollegeData(BaseModel):
-    #The data for each institution
-    college_name: str
-    tuition_free_threshold: float = Field(ge = 0)
-    endowment_size: Optional[float] = Field(default = None, gt = 0)
-    cost_of_attendance: float = Field(gt = 0)
-    average_aid_percentage: Optional[float] = Field(default = None, ge = 0, le = 1)
-
-    model_config = {"frozen": True}
+    name: str
+    tuition: float
