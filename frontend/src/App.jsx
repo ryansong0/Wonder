@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { DollarSign, Percent, Search, FileText, Sparkles, Sliders, Landmark, AlertTriangle } from 'lucide-react';
+import { DollarSign, Percent, Search, FileText, Sparkles, Sliders, Landmark, X, ChevronDown } from 'lucide-react';
 
 const US_STATES = [
   { code: "AK", name: "Alaska" }, { code: "AL", name: "Alabama" }, { code: "AR", name: "Arkansas" },
@@ -22,17 +22,75 @@ const US_STATES = [
 ];
 
 const API_BASE = "http://127.0.0.1:8000";
+const MAX_COMPARISON_SIZE = 6;
+
+function formatDollars(value) {
+  return `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
+function ShortfallRangeRow({ result, maxScale, expanded, onToggle }) {
+  const { summary } = result;
+  const lowPct = (summary.shortfall_range_low / maxScale) * 100;
+  const highPct = (summary.shortfall_range_high / maxScale) * 100;
+  const avgPct = (summary.average_shortfall / maxScale) * 100;
+  const isCssProfile = result.methodology.startsWith("CSS");
+
+  return (
+    <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+      <button onClick={onToggle} className="w-full text-left p-4 flex flex-col gap-3 hover:bg-slate-800/40 transition-colors">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-white truncate">{result.college_evaluated}</p>
+            <span className={`text-[10px] font-bold uppercase tracking-wider ${isCssProfile ? 'text-amber-400' : 'text-emerald-400'}`}>
+              {result.methodology}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 bg-pink-500/10 text-pink-400 text-xs font-bold px-2.5 py-1 rounded-lg">
+              <Percent size={12} />
+              {(summary.probability_of_shortfall * 100).toFixed(0)}% risk
+            </div>
+            <ChevronDown size={16} className={`text-slate-500 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+          </div>
+        </div>
+
+        <div>
+          <div className="relative w-full h-2.5 bg-slate-800 rounded-full">
+            <div
+              className="absolute h-2.5 bg-indigo-500 rounded-full"
+              style={{ left: `${lowPct}%`, width: `${Math.max(highPct - lowPct, 1)}%` }}
+            />
+            <div
+              className="absolute w-0.5 h-2.5 bg-white/80 rounded-full"
+              style={{ left: `${avgPct}%` }}
+              title={`Average: ${formatDollars(summary.average_shortfall)}`}
+            />
+          </div>
+          <div className="flex justify-between mt-1 text-[11px] text-slate-500 font-mono">
+            <span>{formatDollars(summary.shortfall_range_low)}</span>
+            <span>{formatDollars(summary.shortfall_range_high)}</span>
+          </div>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="px-4 pb-4 text-sm text-slate-300 leading-relaxed border-t border-slate-800 pt-3">
+          {result.explanation}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function App() {
   const [colleges, setColleges] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [metrics, setMetrics] = useState(null);
-  const [explanation, setExplanation] = useState("");
+  const [results, setResults] = useState([]);
+  const [expandedName, setExpandedName] = useState(null);
   const [backendError, setBackendError] = useState(null);
-  const [evaluatedCollege, setEvaluatedCollege] = useState("");
-  const [methodology, setMethodology] = useState("");
 
   const [universitySearch, setUniversitySearch] = useState("");
+  const [selectedNames, setSelectedNames] = useState([]);
   const [householdIncome, setHouseholdIncome] = useState("");
   const [totalAssets, setTotalAssets] = useState("");
   const [familySize, setFamilySize] = useState("4");
@@ -45,20 +103,42 @@ export default function App() {
       .catch(() => setBackendError("Could not load the college list. Confirm Uvicorn is running on port 8000."));
   }, []);
 
-  const triggerSimulation = async () => {
-    const matchedCollege = colleges.find(c => c.college_name.toLowerCase() === universitySearch.toLowerCase());
-    if (!matchedCollege || !householdIncome || !totalAssets || !familySize || !studentState) {
-      setBackendError("Please select a university from the list and populate all profile inputs before computing.");
+  const addCollege = () => {
+    const matched = colleges.find(c => c.college_name.toLowerCase() === universitySearch.trim().toLowerCase());
+    if (!matched) {
+      setBackendError("Pick a university from the list before adding it.");
+      return;
+    }
+    if (selectedNames.includes(matched.college_name)) {
+      setUniversitySearch("");
+      return;
+    }
+    if (selectedNames.length >= MAX_COMPARISON_SIZE) {
+      setBackendError(`You can compare up to ${MAX_COMPARISON_SIZE} universities at a time.`);
+      return;
+    }
+    setSelectedNames([...selectedNames, matched.college_name]);
+    setUniversitySearch("");
+    setBackendError(null);
+  };
+
+  const removeCollege = (name) => {
+    setSelectedNames(selectedNames.filter(n => n !== name));
+  };
+
+  const triggerComparison = async () => {
+    if (selectedNames.length === 0 || !householdIncome || !totalAssets || !familySize || !studentState) {
+      setBackendError("Add at least one university and populate all profile inputs before computing.");
       return;
     }
     setLoading(true);
     setBackendError(null);
     try {
-      const response = await fetch(`${API_BASE}/api/simulate`, {
+      const response = await fetch(`${API_BASE}/api/simulate/batch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          college_name: matchedCollege.college_name,
+          college_names: selectedNames,
           student: {
             household_income: Number(householdIncome),
             total_assets: Number(totalAssets),
@@ -72,16 +152,20 @@ export default function App() {
       if (!response.ok) throw new Error("Server response malfunctioned.");
 
       const data = await response.json();
-      setMetrics(data.summary);
-      setExplanation(data.explanation);
-      setEvaluatedCollege(data.college_evaluated);
-      setMethodology(data.methodology);
+      const sorted = [...data.results].sort((a, b) => b.summary.average_shortfall - a.summary.average_shortfall);
+      setResults(sorted);
+      setExpandedName(sorted.length > 0 ? sorted[0].college_evaluated : null);
+      if (data.not_found.length > 0) {
+        setBackendError(`No aid data available for: ${data.not_found.join(", ")}.`);
+      }
     } catch (err) {
       setBackendError("Stochastic backend microservice unreachable. Confirm Uvicorn is running on port 8000.");
     } finally {
       setLoading(false);
     }
   };
+
+  const maxScale = results.length > 0 ? Math.max(...results.map(r => r.summary.shortfall_range_high)) : 0;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6 font-sans antialiased">
@@ -91,7 +175,7 @@ export default function App() {
             WONDER <span className="text-indigo-400 font-light">MONTE CARLO AID ENGINE</span>
           </h1>
           <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">
-            Your Financial Aid Tracker
+            Compare Your Financial Aid Across Universities
           </p>
         </div>
       </header>
@@ -106,13 +190,14 @@ export default function App() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">US University Target</label>
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Add University to Compare</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-3.5 text-slate-500" size={16} />
                   <input
                     type="text"
                     value={universitySearch}
                     onChange={(e) => setUniversitySearch(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCollege(); } }}
                     placeholder="Search university..."
                     list="colleges-list"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 pl-10 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-medium"
@@ -123,6 +208,18 @@ export default function App() {
                     ))}
                   </datalist>
                 </div>
+                {selectedNames.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {selectedNames.map((name) => (
+                      <span key={name} className="flex items-center gap-1.5 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold pl-3 pr-2 py-1.5 rounded-lg">
+                        {name}
+                        <button onClick={() => removeCollege(name)} className="hover:text-white transition-colors">
+                          <X size={12} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div>
@@ -167,77 +264,36 @@ export default function App() {
                 {backendError}
               </div>
             )}
-            <button onClick={triggerSimulation} disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-950 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-widest">
+            <button onClick={triggerComparison} disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-950 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-widest">
               {loading ? <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Sparkles size={14} />}
-              {loading ? "Running Monte Carlo Simulation..." : "Run Aid Uncertainty Simulation"}
+              {loading ? "Running Monte Carlo Simulation..." : "Compare Selected Universities"}
             </button>
           </div>
         </div>
 
-        <div className="lg:col-span-2 space-y-6">
-          {metrics ? (
+        <div className="lg:col-span-2 space-y-4">
+          {results.length > 0 ? (
             <>
-              <div className="flex flex-wrap gap-3">
-                <div className="bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-xl text-xs font-semibold text-indigo-400 flex items-center gap-2">
-                  Target: <span className="text-white font-bold">{evaluatedCollege}</span>
-                </div>
-                <div className="bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-xl text-xs font-semibold text-emerald-400 flex items-center gap-2">
-                  <Landmark size={14} />
-                  Aid Methodology: <span className="text-white font-bold">{methodology}</span>
-                </div>
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 px-1">
+                <DollarSign size={14} className="text-indigo-400" />
+                Projected shortfall range per university (5th–95th percentile) — sorted highest average shortfall first. Click a row for details.
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm">
-                  <div className="flex items-center gap-3 mb-2 text-slate-400">
-                    <div className="p-2 bg-pink-500/10 text-pink-400 rounded-lg"><Percent size={16} /></div>
-                    <span className="text-xs font-bold uppercase tracking-wider">Probability of Shortfall</span>
-                  </div>
-                  <p className="text-2xl font-black text-white font-mono">
-                    {(metrics.probability_of_shortfall * 100).toFixed(0)}%
-                  </p>
-                  <span className="text-[11px] text-slate-500 block mt-1">Share of simulated scenarios where savings don't cover the net cost.</span>
-                </div>
-
-                <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm">
-                  <div className="flex items-center gap-3 mb-2 text-slate-400">
-                    <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-lg"><DollarSign size={16} /></div>
-                    <span className="text-xs font-bold uppercase tracking-wider">Likely Shortfall Range</span>
-                  </div>
-                  <p className="text-2xl font-black text-white font-mono">
-                    ${metrics.shortfall_range_low.toLocaleString(undefined, {maximumFractionDigits: 0})} - ${metrics.shortfall_range_high.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                  </p>
-                  <span className="text-[11px] text-slate-500 block mt-1">5th to 95th percentile across all simulated trials.</span>
-                </div>
-
-                <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm">
-                  <div className="flex items-center gap-3 mb-2 text-slate-400">
-                    <div className="p-2 bg-rose-500/10 text-rose-400 rounded-lg"><AlertTriangle size={16} /></div>
-                    <span className="text-xs font-bold uppercase tracking-wider">Worst-Case Shortfall</span>
-                  </div>
-                  <p className="text-2xl font-black text-white font-mono">
-                    ${metrics.worst_case_shortfall.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                  </p>
-                  <span className="text-[11px] text-slate-500 block mt-1">Maximum shortfall observed across all simulated trials.</span>
-                </div>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-md relative overflow-hidden">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <FileText size={16} className="text-indigo-400" />
-                  Simulation Summary
-                </h3>
-                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-sm text-slate-300 leading-relaxed font-medium">
-                  {explanation}
-                </div>
-              </div>
+              {results.map((result) => (
+                <ShortfallRangeRow
+                  key={result.college_evaluated}
+                  result={result}
+                  maxScale={maxScale}
+                  expanded={expandedName === result.college_evaluated}
+                  onToggle={() => setExpandedName(expandedName === result.college_evaluated ? null : result.college_evaluated)}
+                />
+              ))}
             </>
           ) : (
             <div className="h-full min-h-[350px] border border-dashed border-slate-800 rounded-2xl flex flex-col items-center justify-center text-center p-6 text-slate-500 bg-slate-900/10">
-              <FileText size={32} className="mb-3 text-slate-600" />
+              <Landmark size={32} className="mb-3 text-slate-600" />
               <p className="text-sm font-bold text-slate-400">System Standing By</p>
               <p className="text-xs text-slate-500 mt-1 max-w-sm">
-                Enter your financial profile and pick a university to run a Monte Carlo simulation of your aid uncertainty.
+                Enter your financial profile, add up to {MAX_COMPARISON_SIZE} universities, and run the comparison to see your aid uncertainty side by side.
               </p>
             </div>
           )}
