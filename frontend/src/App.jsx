@@ -21,7 +21,9 @@ const US_STATES = [
   { code: "WV", name: "West Virginia" }, { code: "WY", name: "Wyoming" }
 ];
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+// Strip any trailing slash so a mistyped env var (with or without one) can't
+// produce a double-slash URL like "https://api.example.com//api/colleges".
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
 const MAX_COMPARISON_SIZE = 6;
 
 function formatDollars(value) {
@@ -108,7 +110,7 @@ export default function App() {
     fetch(`${API_BASE}/api/colleges`)
       .then((res) => res.json())
       .then(setColleges)
-      .catch(() => setBackendError("Could not load the college list. Confirm Uvicorn is running on port 8000."));
+      .catch(() => setBackendError(`Could not load the college list from ${API_BASE}. Confirm the backend is running and reachable.`));
   }, []);
 
   const addCollege = () => {
@@ -167,7 +169,7 @@ export default function App() {
         setBackendError(`No aid data available for: ${data.not_found.join(", ")}.`);
       }
     } catch (err) {
-      setBackendError("Stochastic backend microservice unreachable. Confirm Uvicorn is running on port 8000.");
+      setBackendError(`Could not reach the backend at ${API_BASE}. Confirm it's running and reachable.`);
     } finally {
       setLoading(false);
     }
