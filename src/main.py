@@ -19,6 +19,8 @@ app.add_middleware(
 _colleges_by_name = {c.college_name.lower(): c for c in load_college_data()}
 _engine = MonteCarloEngine()
 
+MAX_COMPARISON_SIZE = 6
+
 
 def build_explanation(college, student, result) -> str:
     """Generates the plain-language summary directly from the simulation output,
@@ -34,6 +36,24 @@ def build_explanation(college, student, result) -> str:
         f"there is a {result.probability_of_shortfall * 100:.0f}% chance of a funding shortfall, with a "
         f"typical shortfall between ${result.percentile_05:,.0f} and ${result.percentile_95:,.0f}."
     )
+
+
+def simulate_one(college, student: StudentProfile, runs: int) -> dict:
+    simulation_engine = _engine if runs == _engine.trials else MonteCarloEngine(trials = runs)
+    result = simulation_engine.run_simulation(college, student)
+
+    return {
+        "college_evaluated": result.college_name,
+        "methodology": "CSS Profile / Institutional" if college.requires_css_profile else "Federal Methodology Only",
+        "summary": {
+            "probability_of_shortfall": result.probability_of_shortfall,
+            "average_shortfall": result.average_total_cost,
+            "shortfall_range_low": result.percentile_05,
+            "shortfall_range_high": result.percentile_95,
+            "worst_case_shortfall": result.max_debt,
+        },
+        "explanation": build_explanation(college, student, result),
+    }
 
 
 @app.get("/api/colleges")
@@ -54,18 +74,21 @@ def execute_simulation(college_name: str = Body(...), student: StudentProfile = 
     if college is None:
         raise HTTPException(status_code = 404, detail = f"No aid data available for '{college_name}'.")
 
-    simulation_engine = _engine if runs == _engine.trials else MonteCarloEngine(trials = runs)
-    result = simulation_engine.run_simulation(college, student)
+    return simulate_one(college, student, runs)
 
-    return {
-        "college_evaluated": result.college_name,
-        "methodology": "CSS Profile / Institutional" if college.requires_css_profile else "Federal Methodology Only",
-        "summary": {
-            "probability_of_shortfall": result.probability_of_shortfall,
-            "average_shortfall": result.average_total_cost,
-            "shortfall_range_low": result.percentile_05,
-            "shortfall_range_high": result.percentile_95,
-            "worst_case_shortfall": result.max_debt,
-        },
-        "explanation": build_explanation(college, student, result),
-    }
+
+@app.post("/api/simulate/batch")
+def execute_batch_simulation(college_names: list[str] = Body(...), student: StudentProfile = Body(...), runs: int = Body(NUM_TRIALS)):
+    if len(college_names) > MAX_COMPARISON_SIZE:
+        raise HTTPException(status_code = 400, detail = f"Compare at most {MAX_COMPARISON_SIZE} colleges at a time.")
+
+    results = []
+    not_found = []
+    for name in college_names:
+        college = _colleges_by_name.get(name.lower().strip())
+        if college is None:
+            not_found.append(name)
+            continue
+        results.append(simulate_one(college, student, runs))
+
+    return {"results": results, "not_found": not_found}
