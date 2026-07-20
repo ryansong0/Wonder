@@ -12,6 +12,8 @@ class StudentProfile(BaseModel):
     #gt=0 (greater than 0) ensures the code rejects any nonsensical data (like a negative income)
     state_of_residence: str
 
+    model_config = {"frozen": True}
+
 class CollegeData(BaseModel):
     #The data for each institution
     college_name: str

@@ -1,6 +1,6 @@
-import numpy as np  
+import numpy as np
 import functools
-from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX, INCOME_WEIGHT, ASSET_WEIGHT
+from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX, INCOME_WEIGHT, ASSET_WEIGHT, EFC_SIGMA_CSS_PROFILE, EFC_SIGMA_FEDERAL_ONLY
 # rules for input data format
 from src.schemas import CollegeData, StudentProfile
 # rules for final output
@@ -57,19 +57,26 @@ class MonteCarloEngine:
             all_trial_results = total_debt
         )
     
-    def calculate_net_price(self, student: StudentProfile, college: CollegeData) -> float:
-        """Calculates the expected cost after applying the college's specific financial aid policy."""
+    def calculate_net_price(self, student: StudentProfile, college: CollegeData) -> np.ndarray:
+        """Returns a per-trial array of expected net cost, sampling the family's EFC
+        from a distribution instead of a single point estimate. This is what lets the
+        simulation reflect the real-world fact that the same income/assets produce a
+        different aid offer at every college, not just a different sticker price."""
         # Tuition-Free Policy
         # in this model, if a student is below the threshold, the student pays $0 tuition
         if student.household_income <= college.tuition_free_threshold:
               # assuming that there are still basic fees (about 5% of Cost of Attendance)
-              return college.cost_of_attendance * 0.05
-        # Need-Based Aid
+              return np.full(self.trials, college.cost_of_attendance * 0.05)
+
         # Federal Methodology approximation for Family Contribution
-        efc = (student.household_income * 0.15) + (student.total_assets * 0.05)
-        need = max(0, college.cost_of_attendance - efc)
+        efc_point_estimate = (student.household_income * INCOME_WEIGHT) + (student.total_assets * ASSET_WEIGHT)
+
+        sigma_fraction = EFC_SIGMA_CSS_PROFILE if college.requires_css_profile else EFC_SIGMA_FEDERAL_ONLY
+        efc_samples = np.random.normal(efc_point_estimate, efc_point_estimate * sigma_fraction, self.trials)
+        efc_samples = np.maximum(0, efc_samples)
+
+        need = np.maximum(0, college.cost_of_attendance - efc_samples)
 
         # applying a college's specific aid generosity factor
         aid = need * (college.average_aid_percentage or 0.0)
-        return max(0, college.cost_of_attendance - aid)
-          
+        return np.maximum(0, college.cost_of_attendance - aid)
