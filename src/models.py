@@ -11,3 +11,4 @@ class SimulationResult(BaseModel):
     max_debt: float
     simulation_trials: int
     all_trial_results: np.ndarray
+    calibrated_with_real_data: bool = False

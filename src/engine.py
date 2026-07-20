@@ -6,6 +6,18 @@ from src.schemas import CollegeData, StudentProfile
 # rules for final output
 from src.models import SimulationResult
 
+# Midpoints of the College Scorecard's published income brackets, used to
+# interpolate a school's real net price at a household's exact income. The
+# top bracket ("110001-plus") is open-ended, so 130000 is an approximation,
+# not a midpoint.
+INCOME_BRACKET_MIDPOINTS = [
+    (15000, "net_price_0_30k"),
+    (39000, "net_price_30k_48k"),
+    (61500, "net_price_48k_75k"),
+    (92500, "net_price_75k_110k"),
+    (130000, "net_price_110k_plus"),
+]
+
 class MonteCarloEngine:
     def __init__(self, trials: int = NUM_TRIALS):
         self.trials = trials
@@ -22,15 +34,15 @@ class MonteCarloEngine:
 
         # net tuition after aid
         net_tuition_annual = self.calculate_net_price(student, college)
-        
+
         # tracking total debt accumulated per trial
         total_debt = np.zeros(self.trials)
 
-        
+
         for year in range(YEARS_OF_COLLEGE):
                 # assets grow for all trials
                 assets *= (1 + market_returns[:, year])
-                
+
                 # add cumulative inflation to base tuition
                 inflation_multiplier = np.prod(1 + inflation_rates[:, :year + 1], axis = 1)
 
@@ -43,7 +55,7 @@ class MonteCarloEngine:
 
                 # deduct from assets (note: not below zero)
                 assets = np.maximum(0, assets - current_tuition)
-            
+
         # organize the random results into this format
         return SimulationResult(
             college_name = college.college_name,
@@ -54,29 +66,53 @@ class MonteCarloEngine:
             percentile_05 = np.percentile(total_debt, 5),
             percentile_95 = np.percentile(total_debt, 95),
             simulation_trials = self.trials, # number of trials ran
-            all_trial_results = total_debt
+            all_trial_results = total_debt,
+            calibrated_with_real_data = self.real_net_price_estimate(college, student.household_income) is not None,
         )
-    
+
+    def real_net_price_estimate(self, college: CollegeData, household_income: float) -> float | None:
+        """Interpolates a school's own published net price (College Scorecard) at
+        the household's exact income. Returns None if the school hasn't been
+        calibrated with real data yet, so callers can fall back to the formula."""
+        known_brackets = [
+            (income, getattr(college, field))
+            for income, field in INCOME_BRACKET_MIDPOINTS
+            if getattr(college, field) is not None
+        ]
+        if len(known_brackets) < 2:
+            return None
+        xs, ys = zip(*known_brackets)
+        return float(np.interp(household_income, xs, ys))
+
     def calculate_net_price(self, student: StudentProfile, college: CollegeData) -> np.ndarray:
-        """Returns a per-trial array of expected net cost, sampling the family's EFC
-        from a distribution instead of a single point estimate. This is what lets the
+        """Returns a per-trial array of expected net cost, sampling around a point
+        estimate instead of returning one fixed number. This is what lets the
         simulation reflect the real-world fact that the same income/assets produce a
-        different aid offer at every college, not just a different sticker price."""
+        different aid offer at every college, not just a different sticker price.
+        The point estimate is the school's own reported net price when we have it
+        (calibrated from College Scorecard), and our EFC-based formula otherwise."""
         # Tuition-Free Policy
         # in this model, if a student is below the threshold, the student pays $0 tuition
         if student.household_income <= college.tuition_free_threshold:
               # assuming that there are still basic fees (about 5% of Cost of Attendance)
               return np.full(self.trials, college.cost_of_attendance * 0.05)
 
-        # Federal Methodology approximation for Family Contribution
-        efc_point_estimate = (student.household_income * INCOME_WEIGHT) + (student.total_assets * ASSET_WEIGHT)
+        real_estimate = self.real_net_price_estimate(college, student.household_income)
+        if real_estimate is not None:
+            point_estimate = real_estimate
+        else:
+            # Federal Methodology approximation for Family Contribution
+            efc_point_estimate = (student.household_income * INCOME_WEIGHT) + (student.total_assets * ASSET_WEIGHT)
+            need = max(0, college.cost_of_attendance - efc_point_estimate)
+            # applying a college's specific aid generosity factor
+            aid = need * (college.average_aid_percentage or 0.0)
+            point_estimate = max(0, college.cost_of_attendance - aid)
 
+        # CSS Profile / institutional-methodology schools weigh dozens of discretionary,
+        # non-public factors, so the same income/assets can yield a materially different
+        # aid offer than a federal-methodology-only school, whose formula is public and
+        # mechanical. That gap in predictability is what the uncertainty band represents,
+        # regardless of whether the center point came from real data or our formula.
         sigma_fraction = EFC_SIGMA_CSS_PROFILE if college.requires_css_profile else EFC_SIGMA_FEDERAL_ONLY
-        efc_samples = np.random.normal(efc_point_estimate, efc_point_estimate * sigma_fraction, self.trials)
-        efc_samples = np.maximum(0, efc_samples)
-
-        need = np.maximum(0, college.cost_of_attendance - efc_samples)
-
-        # applying a college's specific aid generosity factor
-        aid = need * (college.average_aid_percentage or 0.0)
-        return np.maximum(0, college.cost_of_attendance - aid)
+        samples = np.random.normal(point_estimate, point_estimate * sigma_fraction, self.trials)
+        return np.maximum(0, samples)
