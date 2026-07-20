@@ -1,3 +1,5 @@
+import os
+
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from src.schemas import StudentProfile
@@ -7,10 +9,16 @@ from src.config import YEARS_OF_COLLEGE, NUM_TRIALS
 
 app = FastAPI(title = "Wonder")
 
-# allows frontend to communicate with your backend securely
+# Comma-separated list of origins allowed to call this API, e.g.
+# "https://wonder.example.com,https://staging.wonder.example.com". Defaults to
+# the local Vite dev server only, so a deployment has to opt in explicitly
+# rather than accepting requests from any origin.
+_default_origins = "http://localhost:5173,http://127.0.0.1:5173"
+ALLOWED_ORIGINS = [origin.strip() for origin in os.environ.get("ALLOWED_ORIGINS", _default_origins).split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = ["*"],
+    allow_origins = ALLOWED_ORIGINS,
     allow_credentials = True,
     allow_methods = ["*"],
     allow_headers = ["*"],
