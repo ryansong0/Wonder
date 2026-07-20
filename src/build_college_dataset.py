@@ -42,7 +42,11 @@ BRACKETS = [
 OWNERSHIP_TO_SECTOR = {1: "public", 2: "private", 3: "private"}
 
 FIELDS = ",".join(
-    ["school.name", "school.state", "school.ownership", "latest.cost.attendance.academic_year"]
+    [
+        "school.name", "school.state", "school.ownership",
+        "latest.cost.attendance.academic_year",
+        "latest.cost.tuition.in_state", "latest.cost.tuition.out_of_state",
+    ]
     + [f"latest.cost.net_price.public.by_income_level.{key}" for key, _ in BRACKETS]
     + [f"latest.cost.net_price.private.by_income_level.{key}" for key, _ in BRACKETS]
 )
@@ -97,10 +101,19 @@ def record_to_row(record: dict) -> dict | None:
     # modeled cost components for a small sample) - clip to 0.
     brackets = {column: (max(0, v) if v is not None else None) for column, v in brackets.items()}
 
+    in_state_tuition = record.get("latest.cost.tuition.in_state")
+    out_of_state_tuition = record.get("latest.cost.tuition.out_of_state")
+    out_of_state_premium = None
+    if in_state_tuition is not None and out_of_state_tuition is not None:
+        # For private schools these are equal (or missing), so the premium is
+        # naturally 0 - no need to special-case by sector.
+        out_of_state_premium = max(0, out_of_state_tuition - in_state_tuition)
+
     return {
         "college_name": record["school.name"],
         "state": record.get("school.state"),
         "cost_of_attendance": coa,
+        "out_of_state_tuition_premium": out_of_state_premium,
         # Real per-bracket data already reflects how generous a school is at
         # low incomes, so there's no need for a separately curated "pays
         # nothing below this income" override the way the original hand-typed
@@ -135,11 +148,11 @@ def main():
 
     # A handful of school names exist in more than one state (e.g. Westminster
     # College is a real, different school in MO, PA, and UT). Disambiguate
-    # only those with their state; "state" isn't part of CollegeData, so it's
-    # never written as its own column.
+    # only those with their state in the name; "state" is also kept as its own
+    # column so the engine can compare it against a student's residency.
     is_duplicate_name = df["college_name"].duplicated(keep = False)
     df.loc[is_duplicate_name, "college_name"] = df.loc[is_duplicate_name, "college_name"] + " (" + df.loc[is_duplicate_name, "state"] + ")"
-    df = df.drop(columns = ["state"]).sort_values("college_name")
+    df = df.sort_values("college_name")
 
     df.to_csv(CSV_PATH, index = False)
 

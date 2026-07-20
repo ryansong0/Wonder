@@ -108,6 +108,15 @@ class MonteCarloEngine:
             aid = need * (college.average_aid_percentage or 0.0)
             point_estimate = max(0, college.cost_of_attendance - aid)
 
+        # The net-price data above is blended across in-state and out-of-state
+        # students, which understates cost for anyone paying out-of-state
+        # tuition (often a large, largely need-aid-independent premium at
+        # public schools). Add the school's own reported dollar gap on top
+        # when the student's residency doesn't match the school's state.
+        # Naturally a no-op for private schools, which charge everyone the same.
+        if college.state and college.out_of_state_tuition_premium and student.state_of_residence.upper() != college.state.upper():
+            point_estimate += college.out_of_state_tuition_premium
+
         # CSS Profile / institutional-methodology schools weigh dozens of discretionary,
         # non-public factors, so the same income/assets can yield a materially different
         # aid offer than a federal-methodology-only school, whose formula is public and

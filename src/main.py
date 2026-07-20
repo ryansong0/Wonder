@@ -45,11 +45,19 @@ def build_explanation(college, student, result) -> str:
         "This school hasn't reported detailed net price data yet, so it's estimated from a general aid formula."
     )
 
+    residency_note = ""
+    if college.state and college.out_of_state_tuition_premium and student.state_of_residence.upper() != college.state.upper():
+        residency_note = (
+            f" As an out-of-state resident, this also includes the school's real reported out-of-state "
+            f"tuition premium of ${college.out_of_state_tuition_premium:,.0f} per year."
+        )
+
     return (
         f"{college.college_name} {methodology_note}. Across {result.simulation_trials:,} simulated "
         f"scenarios for a household earning ${student.household_income:,.0f} over {YEARS_OF_COLLEGE} years, "
         f"there is a {result.probability_of_shortfall * 100:.0f}% chance of a funding shortfall, with a "
-        f"typical shortfall between ${result.percentile_05:,.0f} and ${result.percentile_95:,.0f}. {data_source_note}"
+        f"typical shortfall between ${result.percentile_05:,.0f} and ${result.percentile_95:,.0f}. "
+        f"{data_source_note}{residency_note}"
     )
 
 

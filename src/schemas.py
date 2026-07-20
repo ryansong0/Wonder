@@ -24,12 +24,19 @@ class CollegeData(BaseModel):
     requires_css_profile: bool = False
 
     # Real published net price by household income bracket, sourced from the
-    # College Scorecard API (src/calibrate_from_scorecard.py). None when a school
+    # College Scorecard API (src/build_college_dataset.py). None when a school
     # hasn't been calibrated yet; the engine falls back to the formula estimate.
     net_price_0_30k: Optional[float] = Field(default = None, ge = 0)
     net_price_30k_48k: Optional[float] = Field(default = None, ge = 0)
     net_price_48k_75k: Optional[float] = Field(default = None, ge = 0)
     net_price_75k_110k: Optional[float] = Field(default = None, ge = 0)
     net_price_110k_plus: Optional[float] = Field(default = None, ge = 0)
+
+    # Real state + the real dollar gap between out-of-state and in-state
+    # sticker tuition, both from College Scorecard. Lets the engine add the
+    # out-of-state premium for students who don't live in the school's state;
+    # naturally 0 for private schools, which charge everyone the same.
+    state: Optional[str] = None
+    out_of_state_tuition_premium: Optional[float] = Field(default = None, ge = 0)
 
     model_config = {"frozen": True}
