@@ -1,101 +1,99 @@
-college_name,cost_of_attendance,tuition_free_threshold,average_aid_percentage,endowment_size
-Harvard University,87000,100000,0.95,55000000000
-Duke University,98800,100000,0.92,10000000000
-Yale University,94500,75000,0.93,44000000000
-MIT,89500,90000,0.94,25000000000
-Stanford University,89000,150000,0.94,40800000000
-Princeton University,92000,250000,0.96,36000000000
-University of Pennsylvania,91000,200000,0.93,25000000000
-Columbia University,92500,150000,0.92,16000000000
-Johns Hopkins University,89000,150000,0.91,13700000000
-University of Michigan,75000,125000,0.88,21000000000
-California Institute of Technology,88000,125000,0.94,4500000000
-Northwestern University,90000,150000,0.92,15000000000
-University of Notre Dame,88000,100000,0.90,20000000000
-Washington University in St. Louis,91000,75000,0.90,13300000000
-Emory University,82000,100000,0.85,12000000000
-Vanderbilt University,85000,125000,0.88,10900000000
-Cornell University,88000,150000,0.90,11800000000
-University of Virginia,70000,100000,0.85,11000000000
-Rice University,80000,140000,0.90,8500000000
-UNC Chapel Hill,60000,80000,0.85,6200000000
-University of Chicago,93000,125000,0.91,10600000000
-University of Southern California,88000,80000,0.85,9000000000
-Dartmouth College,90000,125000,0.92,9000000000
-Brown University,88000,125000,0.92,7300000000
-New York University,92000,100000,0.80,7300000000
-University of Texas at Austin,65000,100000,0.80,6500000000
-University of Pittsburgh,60000,75000,0.75,6100000000
-Pennsylvania State University,60000,75000,0.75,5000000000
-University of Wisconsin-Madison,55000,75000,0.78,4900000000
-ULCA,68000,100000,0.82,4800000000
-Michigan State University,58000,70000,0.75,4600000000
-Williams College,82000,150000,0.95,2700000000
-Amherst College,83000,150000,0.96,2600000000
-Pomona College,81000,125000,0.94,2300000000
-Swarthmore College,82000,125000,0.94,2100000000
-Carnegine Mellon University,86000,100000,0.85,2000000000
-Georgia Institute of Technology,55000,75000,0.75,2200000000
-Boston University,85000,80000,0.70,2400000000
-Boston College,84000,80000,0.75,2600000000
-University of Florida,45000,70000,0.65,2800000000
-University of California Berkeley,70000,100000,0.80,7000000000
-University of California San Diego,68000,100000,0.80,2000000000
-University of California Irvine,67000,100000,0.801500000000
-University of California Davis,67000,100000,0.80,2000000000
-University of Illinois Urbana-Champaign,60000,75000,0.75,3500000000
-Tufts University,84000,100000,0.88,2500000000
-Bowdoin College,82000,150000,0.96,2000000000
-Colby College, 82000,150000,0.95,1500000000
-Barnard College,99000,100000,0.33,500000000
-University of California Los Angeles,79000,100000,0.60,5000000000
-Davidson College,80000,100000,0.90,1200000000
-Colgate University,80000,150000,0.90,1200000000
-Rochester University,82000,75000,0.75,2300000000
-University of Richmond,75000,80000,0.75,2400000000
-Skidmore College,76000,75000,0.65,500000000
-Lafayette College,78000,75000,0.75,1000000000
-Middlebury College,82000,150000,0.93,16000000000
-Haverford College,80000,125000,0.93,7000000000
-Vassar College,79000,100000,0.90,12000000000
-Tulane University,83000,80000,0.75,18000000000
-Georgetown University,86000,125000,0.85,3000000000
-Wake Forest University,82000,100000,0.75,1900000000
-University of Maryland,55000,75000,0.70,2000000000
-Case Western Reserve University,81000,80000,0.75,2200000000
-Lehigh University,80000,80000,0.75,1500000000
-Harvey Mudd College,85000,100000,0.90,1000000000
-Ohio State University,60000,80000,0.70,7500000000
-Purdue University,55000,75000,0.65,4000000000
-University of Georgia,55000,75000,0.70,2200000000
-University of Colorado Boulder,65000,80000,0.60,2800000000
-University of Arizona,60000,75000,0.60,1500000000
-University of Iowa,55000,75000,0.60,2100000000
-Arizona State University,55000,75000,0.65,1100000000
-Texas A&M University,55000,80000,0.65,1800000000
-University of Nebraska Lincoln,55000,70000,0.60,2000000000
-Rutgers University,65000,100000,0.70,1500000000
-Indiana University,58000,75000,0.70,4000000000
-University of Minnesota,60000,80000,0.65,6450000000
-Bates College,79000,100000,0.90,5000000000
-University of Washington,65000,80000,0.60,5500000000
-University of Miami,85000,80000,0.75,1300000000
-Louisiana State University,55000,75000,0.65,900000000
-Florida State University,50000,70000,0.65,900000000
-University of Oklahoma,52000,75000,0.65,1600000000
-Auburn University,53000,75000,0.65,1100000000
-University of Oregon,69000,75000,0.65,1300000000
-University of Connecticut,58000,80000,0.61,650000000
-University of Utah,51000,75000,0.50,1500000000
-Syracuse University,88000,80000,0.70,2000000000
-University of Alabama,50000,75000,0.60,1000000000
-Gonzaga University,75000,75000,0.75,500000000
-Clemson University,55000,75000,0.65,1100000000
-University of Vermont,60000,75000,0.60,1000000000
-Pepperdine University,82000,80000,0.75,1000000000
-North Carolina State University,52000,75000,0.65,2500000000
-University of Kentucky,38000,70000,0.65,2000000000
-University of Missouri,30000,65000,0.60,2500000000
-University of Mississippi,33000,60000,0.73,1000000000
-University of Cincinnati,25000,65000,0.60,1900000000
-
+college_name,cost_of_attendance,tuition_free_threshold,average_aid_percentage,endowment_size,requires_css_profile
+Harvard University,87000,100000,0.95,55000000000,True
+Duke University,98800,100000,0.92,10000000000,True
+Yale University,94500,75000,0.93,44000000000,True
+MIT,89500,90000,0.94,25000000000,True
+Stanford University,89000,150000,0.94,40800000000,True
+Princeton University,92000,250000,0.96,36000000000,True
+University of Pennsylvania,91000,200000,0.93,25000000000,True
+Columbia University,92500,150000,0.92,16000000000,True
+Johns Hopkins University,89000,150000,0.91,13700000000,True
+University of Michigan,75000,125000,0.88,21000000000,False
+California Institute of Technology,88000,125000,0.94,4500000000,True
+Northwestern University,90000,150000,0.92,15000000000,True
+University of Notre Dame,88000,100000,0.90,20000000000,True
+Washington University in St. Louis,91000,75000,0.90,13300000000,True
+Emory University,82000,100000,0.85,12000000000,True
+Vanderbilt University,85000,125000,0.88,10900000000,True
+Cornell University,88000,150000,0.90,11800000000,True
+University of Virginia,70000,100000,0.85,11000000000,False
+Rice University,80000,140000,0.90,8500000000,True
+UNC Chapel Hill,60000,80000,0.85,6200000000,False
+University of Chicago,93000,125000,0.91,10600000000,True
+University of Southern California,88000,80000,0.85,9000000000,True
+Dartmouth College,90000,125000,0.92,9000000000,True
+Brown University,88000,125000,0.92,7300000000,True
+New York University,92000,100000,0.80,7300000000,True
+University of Texas at Austin,65000,100000,0.80,6500000000,False
+University of Pittsburgh,60000,75000,0.75,6100000000,False
+Pennsylvania State University,60000,75000,0.75,5000000000,False
+University of Wisconsin-Madison,55000,75000,0.78,4900000000,False
+Michigan State University,58000,70000,0.75,4600000000,False
+Williams College,82000,150000,0.95,2700000000,True
+Amherst College,83000,150000,0.96,2600000000,True
+Pomona College,81000,125000,0.94,2300000000,True
+Swarthmore College,82000,125000,0.94,2100000000,True
+Carnegie Mellon University,86000,100000,0.85,2000000000,True
+Georgia Institute of Technology,55000,75000,0.75,2200000000,False
+Boston University,85000,80000,0.70,2400000000,True
+Boston College,84000,80000,0.75,2600000000,True
+University of Florida,45000,70000,0.65,2800000000,False
+University of California Berkeley,70000,100000,0.80,7000000000,False
+University of California San Diego,68000,100000,0.80,2000000000,False
+University of California Irvine,67000,100000,0.80,1500000000,False
+University of California Davis,67000,100000,0.80,2000000000,False
+University of Illinois Urbana-Champaign,60000,75000,0.75,3500000000,False
+Tufts University,84000,100000,0.88,2500000000,True
+Bowdoin College,82000,150000,0.96,2000000000,True
+Colby College,82000,150000,0.95,1500000000,True
+Barnard College,99000,100000,0.33,500000000,True
+University of California Los Angeles,79000,100000,0.60,5000000000,False
+Davidson College,80000,100000,0.90,1200000000,True
+Colgate University,80000,150000,0.90,1200000000,True
+University of Rochester,82000,75000,0.75,2300000000,True
+University of Richmond,75000,80000,0.75,2400000000,True
+Skidmore College,76000,75000,0.65,500000000,True
+Lafayette College,78000,75000,0.75,1000000000,True
+Middlebury College,82000,150000,0.93,16000000000,True
+Haverford College,80000,125000,0.93,7000000000,True
+Vassar College,79000,100000,0.90,12000000000,True
+Tulane University,83000,80000,0.75,18000000000,True
+Georgetown University,86000,125000,0.85,3000000000,True
+Wake Forest University,82000,100000,0.75,1900000000,True
+University of Maryland,55000,75000,0.70,2000000000,False
+Case Western Reserve University,81000,80000,0.75,2200000000,True
+Lehigh University,80000,80000,0.75,1500000000,True
+Harvey Mudd College,85000,100000,0.90,1000000000,True
+Ohio State University,60000,80000,0.70,7500000000,False
+Purdue University,55000,75000,0.65,4000000000,False
+University of Georgia,55000,75000,0.70,2200000000,False
+University of Colorado Boulder,65000,80000,0.60,2800000000,False
+University of Arizona,60000,75000,0.60,1500000000,False
+University of Iowa,55000,75000,0.60,2100000000,False
+Arizona State University,55000,75000,0.65,1100000000,False
+Texas A&M University,55000,80000,0.65,1800000000,False
+University of Nebraska Lincoln,55000,70000,0.60,2000000000,False
+Rutgers University,65000,100000,0.70,1500000000,False
+Indiana University,58000,75000,0.70,4000000000,False
+University of Minnesota,60000,80000,0.65,6450000000,False
+Bates College,79000,100000,0.90,5000000000,True
+University of Washington,65000,80000,0.60,5500000000,False
+University of Miami,85000,80000,0.75,1300000000,True
+Louisiana State University,55000,75000,0.65,900000000,False
+Florida State University,50000,70000,0.65,900000000,False
+University of Oklahoma,52000,75000,0.65,1600000000,False
+Auburn University,53000,75000,0.65,1100000000,False
+University of Oregon,69000,75000,0.65,1300000000,False
+University of Connecticut,58000,80000,0.61,650000000,False
+University of Utah,51000,75000,0.50,1500000000,False
+Syracuse University,88000,80000,0.70,2000000000,True
+University of Alabama,50000,75000,0.60,1000000000,False
+Gonzaga University,75000,75000,0.75,500000000,True
+Clemson University,55000,75000,0.65,1100000000,False
+University of Vermont,60000,75000,0.60,1000000000,False
+Pepperdine University,82000,80000,0.75,1000000000,True
+North Carolina State University,52000,75000,0.65,2500000000,False
+University of Kentucky,38000,70000,0.65,2000000000,False
+University of Missouri,30000,65000,0.60,2500000000,False
+University of Mississippi,33000,60000,0.73,1000000000,False
+University of Cincinnati,25000,65000,0.60,1900000000,False
