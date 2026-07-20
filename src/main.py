@@ -30,11 +30,18 @@ def build_explanation(college, student, result) -> str:
     else:
         methodology_note = "relies on the federal methodology (FAFSA) only, which follows a fixed, public formula, so its aid offers are comparatively predictable"
 
+    data_source_note = (
+        "This is centered on the school's own reported net price for your income level, "
+        "published to the federal College Scorecard."
+        if result.calibrated_with_real_data else
+        "This school hasn't reported detailed net price data yet, so it's estimated from a general aid formula."
+    )
+
     return (
         f"{college.college_name} {methodology_note}. Across {result.simulation_trials:,} simulated "
         f"scenarios for a household earning ${student.household_income:,.0f} over {YEARS_OF_COLLEGE} years, "
         f"there is a {result.probability_of_shortfall * 100:.0f}% chance of a funding shortfall, with a "
-        f"typical shortfall between ${result.percentile_05:,.0f} and ${result.percentile_95:,.0f}."
+        f"typical shortfall between ${result.percentile_05:,.0f} and ${result.percentile_95:,.0f}. {data_source_note}"
     )
 
 
@@ -51,6 +58,7 @@ def simulate_one(college, student: StudentProfile, runs: int) -> dict:
             "shortfall_range_low": result.percentile_05,
             "shortfall_range_high": result.percentile_95,
             "worst_case_shortfall": result.max_debt,
+            "calibrated_with_real_data": result.calibrated_with_real_data,
         },
         "explanation": build_explanation(college, student, result),
     }

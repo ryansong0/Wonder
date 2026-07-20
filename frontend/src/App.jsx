@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { DollarSign, Percent, Search, FileText, Sparkles, Sliders, Landmark, X, ChevronDown } from 'lucide-react';
+import { DollarSign, Percent, Search, FileText, Sparkles, Sliders, Landmark, X, ChevronDown, BadgeCheck } from 'lucide-react';
 
 const US_STATES = [
   { code: "AK", name: "Alaska" }, { code: "AL", name: "Alabama" }, { code: "AR", name: "Arkansas" },
@@ -41,9 +41,17 @@ function ShortfallRangeRow({ result, maxScale, expanded, onToggle }) {
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-bold text-white truncate">{result.college_evaluated}</p>
-            <span className={`text-[10px] font-bold uppercase tracking-wider ${isCssProfile ? 'text-amber-400' : 'text-emerald-400'}`}>
-              {result.methodology}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${isCssProfile ? 'text-amber-400' : 'text-emerald-400'}`}>
+                {result.methodology}
+              </span>
+              {summary.calibrated_with_real_data && (
+                <span className="flex items-center gap-1 text-[10px] font-bold text-sky-400" title="Centered on this school's own published net price from the College Scorecard">
+                  <BadgeCheck size={11} />
+                  REAL DATA
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <div className="flex items-center gap-1.5 bg-pink-500/10 text-pink-400 text-xs font-bold px-2.5 py-1 rounded-lg">
