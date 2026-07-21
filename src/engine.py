@@ -37,7 +37,10 @@ class MonteCarloEngine:
 
         # tracking total debt accumulated per trial
         total_debt = np.zeros(self.trials)
-
+        # tracking the actual total cost per trial, regardless of whether
+        # assets can cover it - this is what tells "genuinely inexpensive"
+        # apart from "expensive but this family can afford it"
+        total_net_price = np.zeros(self.trials)
 
         for year in range(YEARS_OF_COLLEGE):
                 # assets grow for all trials
@@ -48,6 +51,7 @@ class MonteCarloEngine:
 
                 # inflate tuition for this year
                 current_tuition = net_tuition_annual * inflation_multiplier
+                total_net_price += current_tuition
 
                 # calculate shortfall for all trials simultaneously
                 shortfall = np.maximum(0, current_tuition - assets)
@@ -68,6 +72,9 @@ class MonteCarloEngine:
             simulation_trials = self.trials, # number of trials ran
             all_trial_results = total_debt,
             calibrated_with_real_data = self.real_net_price_estimate(college, student.household_income) is not None,
+            average_net_price = np.mean(total_net_price),
+            net_price_percentile_05 = np.percentile(total_net_price, 5),
+            net_price_percentile_95 = np.percentile(total_net_price, 95),
         )
 
     def real_net_price_estimate(self, college: CollegeData, household_income: float) -> float | None:

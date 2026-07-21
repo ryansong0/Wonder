@@ -55,9 +55,10 @@ def build_explanation(college, student, result) -> str:
     return (
         f"{college.college_name} {methodology_note}. Across {result.simulation_trials:,} simulated "
         f"scenarios for a household earning ${student.household_income:,.0f} over {YEARS_OF_COLLEGE} years, "
-        f"there is a {result.probability_of_shortfall * 100:.0f}% chance of a funding shortfall, with a "
-        f"typical shortfall between ${result.percentile_05:,.0f} and ${result.percentile_95:,.0f}. "
-        f"{data_source_note}{residency_note}"
+        f"the estimated total cost after aid is between ${result.net_price_percentile_05:,.0f} and "
+        f"${result.net_price_percentile_95:,.0f}. There is a {result.probability_of_shortfall * 100:.0f}% chance "
+        f"that cost isn't fully covered by savings, with a typical shortfall between ${result.percentile_05:,.0f} "
+        f"and ${result.percentile_95:,.0f} in that case. {data_source_note}{residency_note}"
     )
 
 
@@ -69,6 +70,9 @@ def simulate_one(college, student: StudentProfile, runs: int) -> dict:
         "college_evaluated": result.college_name,
         "methodology": "CSS Profile / Institutional" if college.requires_css_profile else "Federal Methodology Only",
         "summary": {
+            "average_net_price": result.average_net_price,
+            "net_price_range_low": result.net_price_percentile_05,
+            "net_price_range_high": result.net_price_percentile_95,
             "probability_of_shortfall": result.probability_of_shortfall,
             "average_shortfall": result.average_total_cost,
             "shortfall_range_low": result.percentile_05,

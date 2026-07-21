@@ -106,6 +106,27 @@ def test_very_large_assets_are_capped_at_the_schools_full_price():
     assert np.max(prices) <= (college.cost_of_attendance + college.out_of_state_tuition_premium) * 1.5
 
 
+def test_net_price_stays_visible_even_when_assets_prevent_any_shortfall():
+    engine = MonteCarloEngine(trials = 20000)
+    college = CollegeData(
+        college_name = "Expensive Private U",
+        cost_of_attendance = 90000,
+        requires_css_profile = True,
+        net_price_0_30k = 500,
+        net_price_30k_48k = 1000,
+    )
+    wealthy_student = StudentProfile(household_income = 20000, total_assets = 2000000, family_size = 4, state_of_residence = "NC")
+
+    result = engine.run_simulation(college, wealthy_student)
+
+    # This family can cover any price from savings, so there's no shortfall...
+    assert result.probability_of_shortfall == 0
+    assert result.average_total_cost == 0
+    # ...but the school is still genuinely expensive for them, and that has
+    # to show up somewhere, or the UI would look like the school is free.
+    assert result.average_net_price > 100000
+
+
 def test_school_without_enough_real_data_raises_instead_of_guessing():
     engine = MonteCarloEngine(trials = 500)
     student = StudentProfile(household_income = 40000, total_assets = 0, family_size = 4, state_of_residence = "NC")

@@ -32,10 +32,11 @@ function formatDollars(value) {
 
 function ShortfallRangeRow({ result, maxScale, expanded, onToggle }) {
   const { summary } = result;
-  const lowPct = (summary.shortfall_range_low / maxScale) * 100;
-  const highPct = (summary.shortfall_range_high / maxScale) * 100;
-  const avgPct = (summary.average_shortfall / maxScale) * 100;
+  const lowPct = (summary.net_price_range_low / maxScale) * 100;
+  const highPct = (summary.net_price_range_high / maxScale) * 100;
+  const avgPct = (summary.average_net_price / maxScale) * 100;
   const isCssProfile = result.methodology.startsWith("CSS");
+  const hasShortfallRisk = summary.average_shortfall > 0;
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
@@ -65,7 +66,8 @@ function ShortfallRangeRow({ result, maxScale, expanded, onToggle }) {
         </div>
 
         <div>
-          <div className="relative w-full h-2.5 bg-slate-800 rounded-full">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Estimated total cost after aid (4 years)</span>
+          <div className="relative w-full h-2.5 bg-slate-800 rounded-full mt-1.5">
             <div
               className="absolute h-2.5 bg-indigo-500 rounded-full"
               style={{ left: `${lowPct}%`, width: `${Math.max(highPct - lowPct, 1)}%` }}
@@ -73,14 +75,20 @@ function ShortfallRangeRow({ result, maxScale, expanded, onToggle }) {
             <div
               className="absolute w-0.5 h-2.5 bg-white/80 rounded-full"
               style={{ left: `${avgPct}%` }}
-              title={`Average: ${formatDollars(summary.average_shortfall)}`}
+              title={`Average: ${formatDollars(summary.average_net_price)}`}
             />
           </div>
           <div className="flex justify-between mt-1 text-[11px] text-slate-500 font-mono">
-            <span>{formatDollars(summary.shortfall_range_low)}</span>
-            <span>{formatDollars(summary.shortfall_range_high)}</span>
+            <span>{formatDollars(summary.net_price_range_low)}</span>
+            <span>{formatDollars(summary.net_price_range_high)}</span>
           </div>
         </div>
+
+        {hasShortfallRisk && (
+          <div className="text-[11px] text-rose-400 font-semibold">
+            Typical shortfall if savings don't fully cover it: {formatDollars(summary.shortfall_range_low)} to {formatDollars(summary.shortfall_range_high)}
+          </div>
+        )}
       </button>
 
       {expanded && (
@@ -162,7 +170,7 @@ export default function App() {
       if (!response.ok) throw new Error("Server response malfunctioned.");
 
       const data = await response.json();
-      const sorted = [...data.results].sort((a, b) => b.summary.average_shortfall - a.summary.average_shortfall);
+      const sorted = [...data.results].sort((a, b) => b.summary.average_net_price - a.summary.average_net_price);
       setResults(sorted);
       setExpandedName(sorted.length > 0 ? sorted[0].college_evaluated : null);
       if (data.not_found.length > 0) {
@@ -175,7 +183,7 @@ export default function App() {
     }
   };
 
-  const maxScale = results.length > 0 ? Math.max(...results.map(r => r.summary.shortfall_range_high)) : 0;
+  const maxScale = results.length > 0 ? Math.max(...results.map(r => r.summary.net_price_range_high)) : 0;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6 font-sans antialiased">
@@ -285,7 +293,7 @@ export default function App() {
             <>
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 px-1">
                 <DollarSign size={14} className="text-indigo-400" />
-                Projected shortfall range per university (5th–95th percentile) — sorted highest average shortfall first. Click a row for details.
+                Estimated total cost per university (5th to 95th percentile), sorted highest cost first. Shortfall risk shown separately when savings wouldn't fully cover it. Click a row for details.
               </div>
               {results.map((result) => (
                 <ShortfallRangeRow
