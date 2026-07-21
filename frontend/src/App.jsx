@@ -116,7 +116,7 @@ export default function App() {
   const [universitySearch, setUniversitySearch] = useState("");
   const [selectedNames, setSelectedNames] = useState([]);
   const [householdIncome, setHouseholdIncome] = useState("");
-  const [totalAssets, setTotalAssets] = useState("");
+  const [liquidAssets, setLiquidAssets] = useState("");
   const [familySize, setFamilySize] = useState("4");
   const [studentState, setStudentState] = useState("");
 
@@ -151,7 +151,7 @@ export default function App() {
   };
 
   const triggerComparison = async () => {
-    if (selectedNames.length === 0 || !householdIncome || !totalAssets || !familySize || !studentState) {
+    if (selectedNames.length === 0 || !householdIncome || !liquidAssets || !familySize || !studentState) {
       setBackendError("Add at least one university and populate all profile inputs before computing.");
       return;
     }
@@ -165,7 +165,7 @@ export default function App() {
           college_names: selectedNames,
           student: {
             household_income: Number(householdIncome),
-            total_assets: Number(totalAssets),
+            liquid_assets: Number(liquidAssets),
             family_size: Number(familySize),
             state_of_residence: studentState,
           },
@@ -253,8 +253,16 @@ export default function App() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Total Assets ($)</label>
-                  <input type="number" value={totalAssets} onChange={(e) => setTotalAssets(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-mono" />
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Liquid Assets ($)</label>
+                  <input
+                    type="number"
+                    value={liquidAssets}
+                    onChange={(e) => setLiquidAssets(e.target.value)}
+                    placeholder="Savings, not home value"
+                    title="Savings, checking, and taxable investment accounts only. Not home equity or retirement accounts."
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                  />
+                  <span className="text-[10px] text-slate-500 block mt-1">Savings & investments only, not home equity or retirement</span>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Family Size</label>

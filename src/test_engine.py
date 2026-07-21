@@ -8,7 +8,7 @@ def test_css_profile_schools_have_wider_aid_uncertainty_than_federal_only():
     engine = MonteCarloEngine(trials = 20000)
     student = StudentProfile(
         household_income = 150000,
-        total_assets = 40000,
+        liquid_assets = 40000,
         family_size = 4,
         state_of_residence = "NC",
     )
@@ -39,8 +39,8 @@ def test_out_of_state_student_pays_the_real_tuition_premium():
         net_price_0_30k = 10000,
         net_price_30k_48k = 12000,
     )
-    in_state_student = StudentProfile(household_income = 40000, total_assets = 5000, family_size = 4, state_of_residence = "NC")
-    out_of_state_student = StudentProfile(household_income = 40000, total_assets = 5000, family_size = 4, state_of_residence = "CA")
+    in_state_student = StudentProfile(household_income = 40000, liquid_assets = 5000, family_size = 4, state_of_residence = "NC")
+    out_of_state_student = StudentProfile(household_income = 40000, liquid_assets = 5000, family_size = 4, state_of_residence = "CA")
 
     in_state_prices = engine.calculate_net_price(in_state_student, college)
     out_of_state_prices = engine.calculate_net_price(out_of_state_student, college)
@@ -59,8 +59,8 @@ def test_private_school_premium_is_a_no_op_regardless_of_residency():
         net_price_0_30k = 15000,
         net_price_30k_48k = 18000,
     )
-    in_state_student = StudentProfile(household_income = 40000, total_assets = 5000, family_size = 4, state_of_residence = "NC")
-    out_of_state_student = StudentProfile(household_income = 40000, total_assets = 5000, family_size = 4, state_of_residence = "CA")
+    in_state_student = StudentProfile(household_income = 40000, liquid_assets = 5000, family_size = 4, state_of_residence = "NC")
+    out_of_state_student = StudentProfile(household_income = 40000, liquid_assets = 5000, family_size = 4, state_of_residence = "CA")
 
     in_state_prices = engine.calculate_net_price(in_state_student, college)
     out_of_state_prices = engine.calculate_net_price(out_of_state_student, college)
@@ -77,8 +77,8 @@ def test_higher_assets_increase_the_estimated_net_price():
         net_price_0_30k = 10000,
         net_price_30k_48k = 12000,
     )
-    modest_assets = StudentProfile(household_income = 40000, total_assets = 20000, family_size = 4, state_of_residence = "NC")
-    large_assets = StudentProfile(household_income = 40000, total_assets = 500000, family_size = 4, state_of_residence = "NC")
+    modest_assets = StudentProfile(household_income = 40000, liquid_assets = 20000, family_size = 4, state_of_residence = "NC")
+    large_assets = StudentProfile(household_income = 40000, liquid_assets = 500000, family_size = 4, state_of_residence = "NC")
 
     modest_prices = engine.calculate_net_price(modest_assets, college)
     large_prices = engine.calculate_net_price(large_assets, college)
@@ -97,7 +97,7 @@ def test_very_large_assets_are_capped_at_the_schools_full_price():
         net_price_0_30k = 10000,
         net_price_30k_48k = 12000,
     )
-    wealthy_out_of_state = StudentProfile(household_income = 40000, total_assets = 10000000, family_size = 4, state_of_residence = "CA")
+    wealthy_out_of_state = StudentProfile(household_income = 40000, liquid_assets = 10000000, family_size = 4, state_of_residence = "CA")
 
     prices = engine.calculate_net_price(wealthy_out_of_state, college)
 
@@ -115,7 +115,7 @@ def test_net_price_stays_visible_even_when_assets_prevent_any_shortfall():
         net_price_0_30k = 500,
         net_price_30k_48k = 1000,
     )
-    wealthy_student = StudentProfile(household_income = 20000, total_assets = 2000000, family_size = 4, state_of_residence = "NC")
+    wealthy_student = StudentProfile(household_income = 20000, liquid_assets = 2000000, family_size = 4, state_of_residence = "NC")
 
     result = engine.run_simulation(college, wealthy_student)
 
@@ -129,7 +129,7 @@ def test_net_price_stays_visible_even_when_assets_prevent_any_shortfall():
 
 def test_school_without_enough_real_data_raises_instead_of_guessing():
     engine = MonteCarloEngine(trials = 500)
-    student = StudentProfile(household_income = 40000, total_assets = 0, family_size = 4, state_of_residence = "NC")
+    student = StudentProfile(household_income = 40000, liquid_assets = 0, family_size = 4, state_of_residence = "NC")
     college = CollegeData(
         college_name = "Uncalibrated U",
         cost_of_attendance = 80000,

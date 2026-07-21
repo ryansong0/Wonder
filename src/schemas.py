@@ -25,7 +25,11 @@ class StudentProfile(BaseModel):
     #The data a user enters once.
     #... means a value must be provided, which is greater than 0
     household_income: float = Field(..., gt = 0)
-    total_assets: float = Field(..., ge = 0) #ge=0 (greater than or equal to 0)
+    # Liquid, spendable assets only (savings, checking, taxable investment
+    # accounts) - not home equity, retirement accounts, or personal property.
+    # The federal aid formula excludes those too, and the simulation assumes
+    # this figure can actually be spent paying tuition.
+    liquid_assets: float = Field(..., ge = 0) #ge=0 (greater than or equal to 0)
     family_size: int = Field(..., gt = 0)
     #gt=0 (greater than 0) ensures the code rejects any nonsensical data (like a negative income)
     state_of_residence: str

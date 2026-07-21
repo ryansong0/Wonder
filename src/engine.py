@@ -30,7 +30,7 @@ class MonteCarloEngine:
 
         inflation_rates = np.random.uniform(INFLATION_MIN, INFLATION_MAX, (self.trials, YEARS_OF_COLLEGE))
 
-        assets = np.full(self.trials, student.total_assets, dtype = float)
+        assets = np.full(self.trials, student.liquid_assets, dtype = float)
 
         # net tuition after aid
         net_tuition_annual = self.calculate_net_price(student, college)
@@ -128,7 +128,7 @@ class MonteCarloEngine:
         # Index formula's own published assessment rate on parent assets, then
         # caps the result at the school's real full price, so a very high-asset
         # family lands on "pay full price" instead of an unbounded number.
-        point_estimate += student.total_assets * ASSET_ASSESSMENT_RATE
+        point_estimate += student.liquid_assets * ASSET_ASSESSMENT_RATE
         point_estimate = min(point_estimate, full_price_ceiling)
 
         # CSS Profile / institutional-methodology schools weigh dozens of discretionary,
