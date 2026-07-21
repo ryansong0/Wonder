@@ -1,6 +1,6 @@
 import numpy as np
 import functools
-from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX, EFC_SIGMA_CSS_PROFILE, EFC_SIGMA_FEDERAL_ONLY
+from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX, EFC_SIGMA_CSS_PROFILE, EFC_SIGMA_FEDERAL_ONLY, ASSET_ASSESSMENT_RATE
 # rules for input data format
 from src.schemas import CollegeData, StudentProfile
 # rules for final output
@@ -99,6 +99,10 @@ class MonteCarloEngine:
                 "cannot simulate without real published net-price data."
             )
         point_estimate = real_estimate
+        # No family pays more than a school's actual full price. Tracked
+        # separately from cost_of_attendance because an out-of-state student's
+        # real full price is higher than the school's blended published figure.
+        full_price_ceiling = college.cost_of_attendance
 
         # The net-price data above is blended across in-state and out-of-state
         # students, which understates cost for anyone paying out-of-state
@@ -108,6 +112,17 @@ class MonteCarloEngine:
         # Naturally a no-op for private schools, which charge everyone the same.
         if college.state and college.out_of_state_tuition_premium and student.state_of_residence.upper() != college.state.upper():
             point_estimate += college.out_of_state_tuition_premium
+            full_price_ceiling += college.out_of_state_tuition_premium
+
+        # The net-price data above only varies by income, since that's the only
+        # dimension College Scorecard publishes it by - it can't reflect that a
+        # family with the same income but much larger assets would realistically
+        # be offered less need-based aid. This adds the federal Student Aid
+        # Index formula's own published assessment rate on parent assets, then
+        # caps the result at the school's real full price, so a very high-asset
+        # family lands on "pay full price" instead of an unbounded number.
+        point_estimate += student.total_assets * ASSET_ASSESSMENT_RATE
+        point_estimate = min(point_estimate, full_price_ceiling)
 
         # CSS Profile / institutional-methodology schools weigh dozens of discretionary,
         # non-public factors, so the same income/assets can yield a materially different

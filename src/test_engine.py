@@ -68,6 +68,44 @@ def test_private_school_premium_is_a_no_op_regardless_of_residency():
     assert np.mean(out_of_state_prices) == pytest.approx(np.mean(in_state_prices), rel = 0.05)
 
 
+def test_higher_assets_increase_the_estimated_net_price():
+    engine = MonteCarloEngine(trials = 20000)
+    college = CollegeData(
+        college_name = "State U",
+        cost_of_attendance = 90000,
+        requires_css_profile = False,
+        net_price_0_30k = 10000,
+        net_price_30k_48k = 12000,
+    )
+    modest_assets = StudentProfile(household_income = 40000, total_assets = 20000, family_size = 4, state_of_residence = "NC")
+    large_assets = StudentProfile(household_income = 40000, total_assets = 500000, family_size = 4, state_of_residence = "NC")
+
+    modest_prices = engine.calculate_net_price(modest_assets, college)
+    large_prices = engine.calculate_net_price(large_assets, college)
+
+    assert np.mean(large_prices) > np.mean(modest_prices)
+
+
+def test_very_large_assets_are_capped_at_the_schools_full_price():
+    engine = MonteCarloEngine(trials = 20000)
+    college = CollegeData(
+        college_name = "State U",
+        cost_of_attendance = 90000,
+        requires_css_profile = False,
+        state = "NC",
+        out_of_state_tuition_premium = 15000,
+        net_price_0_30k = 10000,
+        net_price_30k_48k = 12000,
+    )
+    wealthy_out_of_state = StudentProfile(household_income = 40000, total_assets = 10000000, family_size = 4, state_of_residence = "CA")
+
+    prices = engine.calculate_net_price(wealthy_out_of_state, college)
+
+    # Full price for an out-of-state student is cost_of_attendance plus the
+    # real tuition premium, not a number that grows without bound.
+    assert np.max(prices) <= (college.cost_of_attendance + college.out_of_state_tuition_premium) * 1.5
+
+
 def test_school_without_enough_real_data_raises_instead_of_guessing():
     engine = MonteCarloEngine(trials = 500)
     student = StudentProfile(household_income = 40000, total_assets = 0, family_size = 4, state_of_residence = "NC")
