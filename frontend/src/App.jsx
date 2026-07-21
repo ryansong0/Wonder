@@ -36,7 +36,11 @@ function ShortfallRangeRow({ result, maxScale, expanded, onToggle }) {
   const highPct = (summary.net_price_range_high / maxScale) * 100;
   const avgPct = (summary.average_net_price / maxScale) * 100;
   const isCssProfile = result.methodology.startsWith("CSS");
-  const hasShortfallRisk = summary.average_shortfall > 0;
+  // 0.5% is the point below which the risk badge would display as "0% risk"
+  // (it's rounded to the nearest whole percent) - showing the badge and the
+  // shortfall callout only above that avoids the confusing "0% risk, here's
+  // your shortfall" combination for a probability too small to round up.
+  const hasShortfallRisk = summary.probability_of_shortfall >= 0.005;
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
@@ -57,10 +61,12 @@ function ShortfallRangeRow({ result, maxScale, expanded, onToggle }) {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <div className="flex items-center gap-1.5 bg-pink-500/10 text-pink-400 text-xs font-bold px-2.5 py-1 rounded-lg">
-              <Percent size={12} />
-              {(summary.probability_of_shortfall * 100).toFixed(0)}% risk
-            </div>
+            {hasShortfallRisk && (
+              <div className="flex items-center gap-1.5 bg-pink-500/10 text-pink-400 text-xs font-bold px-2.5 py-1 rounded-lg">
+                <Percent size={12} />
+                {(summary.probability_of_shortfall * 100).toFixed(0)}% risk
+              </div>
+            )}
             <ChevronDown size={16} className={`text-slate-500 transition-transform ${expanded ? 'rotate-180' : ''}`} />
           </div>
         </div>
