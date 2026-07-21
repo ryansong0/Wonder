@@ -47,8 +47,8 @@ A few choices were made on purpose and are worth explaining rather than hiding:
 
 ## Live demo
 
-Frontend: [add your live URL here]
-Backend API: [add your live URL here]
+Frontend: https://wonder-financial-aid.vercel.app
+Backend API: https://wonder-alpha-three.vercel.app/api/colleges
 
 ## Running it locally
 
