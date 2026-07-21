@@ -20,10 +20,6 @@ MARKET_RETURN_MAX = config['simulation'].get('market_return_max', 0.08)
 INFLATION_MIN = config['simulation'].get('inflation_min', 0.02)
 INFLATION_MAX = config['simulation'].get('inflation_max', 0.05)
 
-# Calculation Weights (used in EFC calculation)
-INCOME_WEIGHT = config['weights'].get('income_weight', 0.10)
-ASSET_WEIGHT = config['weights'].get('asset_weight', 0.05)
-
 # Aid Methodology Uncertainty
 # CSS Profile / institutional-methodology schools weigh dozens of discretionary,
 # non-public factors (home equity, non-custodial income, sibling counts, etc.), so

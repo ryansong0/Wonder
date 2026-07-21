@@ -1,6 +1,6 @@
 import numpy as np
 import functools
-from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX, INCOME_WEIGHT, ASSET_WEIGHT, EFC_SIGMA_CSS_PROFILE, EFC_SIGMA_FEDERAL_ONLY
+from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX, EFC_SIGMA_CSS_PROFILE, EFC_SIGMA_FEDERAL_ONLY
 # rules for input data format
 from src.schemas import CollegeData, StudentProfile
 # rules for final output
@@ -89,24 +89,16 @@ class MonteCarloEngine:
         estimate instead of returning one fixed number. This is what lets the
         simulation reflect the real-world fact that the same income/assets produce a
         different aid offer at every college, not just a different sticker price.
-        The point estimate is the school's own reported net price when we have it
-        (calibrated from College Scorecard), and our EFC-based formula otherwise."""
-        # Tuition-Free Policy
-        # in this model, if a student is below the threshold, the student pays $0 tuition
-        if student.household_income <= college.tuition_free_threshold:
-              # assuming that there are still basic fees (about 5% of Cost of Attendance)
-              return np.full(self.trials, college.cost_of_attendance * 0.05)
-
+        The point estimate is always the school's own reported net price
+        (calibrated from College Scorecard) - every school in the dataset is
+        required to have it (see build_college_dataset.py's bracket-count filter)."""
         real_estimate = self.real_net_price_estimate(college, student.household_income)
-        if real_estimate is not None:
-            point_estimate = real_estimate
-        else:
-            # Federal Methodology approximation for Family Contribution
-            efc_point_estimate = (student.household_income * INCOME_WEIGHT) + (student.total_assets * ASSET_WEIGHT)
-            need = max(0, college.cost_of_attendance - efc_point_estimate)
-            # applying a college's specific aid generosity factor
-            aid = need * (college.average_aid_percentage or 0.0)
-            point_estimate = max(0, college.cost_of_attendance - aid)
+        if real_estimate is None:
+            raise ValueError(
+                f"'{college.college_name}' has fewer than two net-price-by-income brackets; "
+                "cannot simulate without real published net-price data."
+            )
+        point_estimate = real_estimate
 
         # The net-price data above is blended across in-state and out-of-state
         # students, which understates cost for anyone paying out-of-state

@@ -4,7 +4,7 @@ import { DollarSign, Percent, Search, FileText, Sparkles, Sliders, Landmark, X, 
 const US_STATES = [
   { code: "AK", name: "Alaska" }, { code: "AL", name: "Alabama" }, { code: "AR", name: "Arkansas" },
   { code: "AZ", name: "Arizona" }, { code: "CA", name: "California" }, { code: "CO", name: "Colorado" },
-  { code: "CT", name: "Connecticut" }, { code: "DE", name: "Delaware" }, { code: "FL", name: "Florida" },
+  { code: "CT", name: "Connecticut" }, { code: "DE", name: "Delaware" }, { code: "DC", name: "District of Columbia" }, { code: "FL", name: "Florida" },
   { code: "GA", name: "Georgia" }, { code: "HI", name: "Hawaii" }, { code: "IA", name: "Iowa" },
   { code: "ID", name: "Idaho" }, { code: "IL", name: "Illinois" }, { code: "IN", name: "Indiana" },
   { code: "KS", name: "Kansas" }, { code: "KY", name: "Kentucky" }, { code: "LA", name: "Louisiana" },
@@ -253,11 +253,10 @@ export default function App() {
                 <input
                   type="text"
                   value={studentState}
-                  onChange={(e) => setStudentState(e.target.value.toUpperCase())}
-                  placeholder="AK"
+                  onChange={(e) => setStudentState(e.target.value)}
+                  placeholder="NC or North Carolina"
                   list="states-list"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all uppercase font-medium"
-                  maxLength={2}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-medium"
                 />
                 <datalist id="states-list">
                   {US_STATES.map((st, idx) => (

@@ -13,9 +13,9 @@ def test_css_profile_schools_have_wider_aid_uncertainty_than_federal_only():
         state_of_residence = "NC",
     )
     shared_kwargs = dict(
-        tuition_free_threshold = 50000,
         cost_of_attendance = 80000,
-        average_aid_percentage = 0.85,
+        net_price_75k_110k = 40000,
+        net_price_110k_plus = 55000,
     )
     css_profile_school = CollegeData(college_name = "CSS Profile U", requires_css_profile = True, **shared_kwargs)
     federal_only_school = CollegeData(college_name = "Federal Only U", requires_css_profile = False, **shared_kwargs)
@@ -32,7 +32,6 @@ def test_out_of_state_student_pays_the_real_tuition_premium():
     engine = MonteCarloEngine(trials = 20000)
     college = CollegeData(
         college_name = "State U",
-        tuition_free_threshold = 0,
         cost_of_attendance = 30000,
         requires_css_profile = False,
         state = "NC",
@@ -53,7 +52,6 @@ def test_private_school_premium_is_a_no_op_regardless_of_residency():
     engine = MonteCarloEngine(trials = 20000)
     college = CollegeData(
         college_name = "Private U",
-        tuition_free_threshold = 0,
         cost_of_attendance = 60000,
         requires_css_profile = True,
         state = "NC",
@@ -70,17 +68,15 @@ def test_private_school_premium_is_a_no_op_regardless_of_residency():
     assert np.mean(out_of_state_prices) == pytest.approx(np.mean(in_state_prices), rel = 0.05)
 
 
-def test_income_below_threshold_pays_flat_fee_with_no_variance():
+def test_school_without_enough_real_data_raises_instead_of_guessing():
     engine = MonteCarloEngine(trials = 500)
     student = StudentProfile(household_income = 40000, total_assets = 0, family_size = 4, state_of_residence = "NC")
     college = CollegeData(
-        college_name = "Generous U",
-        tuition_free_threshold = 100000,
+        college_name = "Uncalibrated U",
         cost_of_attendance = 80000,
-        average_aid_percentage = 0.9,
         requires_css_profile = True,
+        net_price_0_30k = 5000,
     )
 
-    prices = engine.calculate_net_price(student, college)
-
-    assert np.allclose(prices, college.cost_of_attendance * 0.05)
+    with pytest.raises(ValueError):
+        engine.calculate_net_price(student, college)

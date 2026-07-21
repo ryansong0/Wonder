@@ -114,16 +114,6 @@ def record_to_row(record: dict) -> dict | None:
         "state": record.get("school.state"),
         "cost_of_attendance": coa,
         "out_of_state_tuition_premium": out_of_state_premium,
-        # Real per-bracket data already reflects how generous a school is at
-        # low incomes, so there's no need for a separately curated "pays
-        # nothing below this income" override the way the original hand-typed
-        # list had - leaving this at 0 lets the real data speak for itself.
-        "tuition_free_threshold": 0,
-        # Not derivable from Scorecard and unused once real bracket data
-        # exists (see MonteCarloEngine.calculate_net_price's formula-fallback
-        # branch, which is what this would otherwise feed).
-        "average_aid_percentage": None,
-        "endowment_size": None,
         # Scorecard doesn't report which aid methodology a school uses. This
         # is the same ownership-based proxy used for the original hand-picked
         # list: private institutions (nonprofit or for-profit) skew toward

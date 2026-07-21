@@ -1,6 +1,24 @@
 #pydantic - industry standard for Data Validation
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
+
+# Full US state/territory name -> 2-letter code, so a student can type either
+# "NY" or "New York" and have it resolve to the same value a college's own
+# "state" field uses (College Scorecard reports state as a 2-letter code).
+US_STATE_NAME_TO_CODE = {
+    "alabama": "AL", "alaska": "AK", "arizona": "AZ", "arkansas": "AR", "california": "CA",
+    "colorado": "CO", "connecticut": "CT", "delaware": "DE", "district of columbia": "DC",
+    "florida": "FL", "georgia": "GA", "hawaii": "HI", "idaho": "ID", "illinois": "IL",
+    "indiana": "IN", "iowa": "IA", "kansas": "KS", "kentucky": "KY", "louisiana": "LA",
+    "maine": "ME", "maryland": "MD", "massachusetts": "MA", "michigan": "MI", "minnesota": "MN",
+    "mississippi": "MS", "missouri": "MO", "montana": "MT", "nebraska": "NE", "nevada": "NV",
+    "new hampshire": "NH", "new jersey": "NJ", "new mexico": "NM", "new york": "NY",
+    "north carolina": "NC", "north dakota": "ND", "ohio": "OH", "oklahoma": "OK", "oregon": "OR",
+    "pennsylvania": "PA", "rhode island": "RI", "south carolina": "SC", "south dakota": "SD",
+    "tennessee": "TN", "texas": "TX", "utah": "UT", "vermont": "VT", "virginia": "VA",
+    "washington": "WA", "west virginia": "WV", "wisconsin": "WI", "wyoming": "WY",
+}
+US_STATE_CODES = set(US_STATE_NAME_TO_CODE.values())
 
 #blueprint for what the student is
 class StudentProfile(BaseModel):
@@ -12,20 +30,29 @@ class StudentProfile(BaseModel):
     #gt=0 (greater than 0) ensures the code rejects any nonsensical data (like a negative income)
     state_of_residence: str
 
+    @field_validator("state_of_residence")
+    @classmethod
+    def normalize_state(cls, value: str) -> str:
+        cleaned = value.strip()
+        if cleaned.upper() in US_STATE_CODES:
+            return cleaned.upper()
+        code = US_STATE_NAME_TO_CODE.get(cleaned.lower())
+        if code:
+            return code
+        raise ValueError(f"'{value}' is not a recognized US state or territory")
+
     model_config = {"frozen": True}
 
 class CollegeData(BaseModel):
     #The data for each institution
     college_name: str
-    tuition_free_threshold: float = Field(ge = 0)
-    endowment_size: Optional[float] = Field(default = None, gt = 0)
     cost_of_attendance: float = Field(gt = 0)
-    average_aid_percentage: Optional[float] = Field(default = None, ge = 0, le = 1)
     requires_css_profile: bool = False
 
     # Real published net price by household income bracket, sourced from the
-    # College Scorecard API (src/build_college_dataset.py). None when a school
-    # hasn't been calibrated yet; the engine falls back to the formula estimate.
+    # College Scorecard API (src/build_college_dataset.py). Every school in
+    # the current dataset has at least 2 of these; calculate_net_price requires
+    # it and errors otherwise rather than guessing.
     net_price_0_30k: Optional[float] = Field(default = None, ge = 0)
     net_price_30k_48k: Optional[float] = Field(default = None, ge = 0)
     net_price_48k_75k: Optional[float] = Field(default = None, ge = 0)
