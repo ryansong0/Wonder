@@ -1,44 +1,94 @@
 # Wonder
 
-### The Problem
-In today's age, where private institutions' annual cost of attendance can range to upwards of $100,000 annually, students and parents face significant financial uncertainty. Currently, colleges have their own independent cost of attendance calculators that force students to re-input their financial profiles for every potential college to predict their aid at each school. For instance, if a student planed to apply to 17 schools, that student would need to plug in his/her information in all 17 college calculators to see how much the cost of attendance would be at each school. This time-consuming and repetitive process should not be what students worry about. Rather, they should be spending their time focusing on their critical college applications. As financial aid is determined by a combination of the institution's endowment size for its available funding for scholarships and grants, as well historical enrollment and aid-required data for an estimation to the incoming class, each college's aid package varies greatly from each other, which can make static estimates misleading.
+Wonder estimates what a family will actually pay for college, and how much that estimate could vary, for over 1,700 US schools.
 
-### The Solution
-This project provides a centralized financial aid engine that eliminates the redundant data entry process that is currently ongoing. Creating a unified ingestion layer and a high-throughput modeling framework, my system simultaneously generates stochastic financial aid projections for 100+ institutions. This replaces a manual, multi-step workflow with a single, optimized user interaction. Additionally, instead of providing a single (and often misleading) estimation value, my engine uses Monte Carlo simulations to present a range of probable values, providing a more transparent view of potential net costs for each university. My hope is that students and parents can avoid wasting their time inputting their information repeatedly for each school (which is something that I had to do during my senior year of high school, as I applied to 15+ schools), and can instead use my project as a resource to be more time-efficient during the college application season!
+## The problem
 
-## Performance 
-The project uses NumPy vectorization to process simulation trials in batches at the same time, which allows the system to scale 1,000,000+ trials fast.
+Every college publishes its own net price calculator, and every one of them asks for the same financial information. Applying to ten schools means filling out ten forms with the same numbers, and each school comes back with a different answer because they use different methods to calculate aid. The CSS Profile and the FAFSA don't agree with each other, and neither one tells you what a specific school will actually offer.
 
-## Results
-The tests were performed using an optimized vector-based execution model.
+I ran into this directly during my college applications. I wanted one place to enter my family's finances once and see a realistic range of what each school would cost, instead of a single number that might not hold up once a real aid office looks at the file.
 
-| Simulation Trials | Processing Time | Throughput |
-| :--- | :--- | :--- |
-| 10,000 | 0.042s | 238,000 trials/sec |
-| 100,000 | 0.058s | 1,724,000 trials/sec |
-| 1,000,000 | 0.412s | 2,427,000 trials/sec |
+## What it does
 
+You enter household income, assets, family size, and home state once. You add any schools you're considering, up to six at a time, and Wonder runs a simulation for each one and shows you the likely range of what you'd pay, not just a single average.
 
-### Getting Started
+- Compares multiple schools side by side from one set of inputs
+- Shows a probability of facing a funding shortfall, not just an average cost
+- Widens or narrows that range depending on how predictable a school's aid process actually is
+- Adjusts public school estimates based on whether you live in that state
+- Pulls real cost and aid data from the federal government for every school it can, and says so when it does
 
-#### 1. Setup Environment
+## How it works
 
-First, clone the repository and set up the virtual environment:
-```bash
-# Create and activate the environment
-python -m venv venv
+Instead of computing one fixed number for what a school will cost, Wonder runs thousands of simulated scenarios per school and looks at the spread of outcomes. Two things drive that spread.
 
-# For Windows: 
-venv\Scripts\activate
+The first is the school's aid methodology. Schools that use the CSS Profile weigh things like home equity and a parent's business assets that the federal formula doesn't touch, and their aid offices have more discretion in general. That makes their aid harder to predict, so those schools get a wider range in the simulation. Schools that only use the federal methodology follow a fixed public formula, so their range is narrower.
 
-# For macOS/Linux:
-source venv/bin/activate
+The second is location. Public schools charge in-state and out-of-state students very different amounts, sometimes two to three times as much. Wonder pulls each school's real in-state and out-of-state tuition and adds that difference for anyone applying from outside the school's home state.
 
-# Install
-pip install -r requirements.txt
+Wherever possible, the numbers driving all of this come from the College Scorecard, a public dataset the Department of Education maintains on what students at each school actually pay by income bracket. When a school doesn't publish enough of that data, Wonder says so instead of quietly guessing.
+
+## Product decisions worth knowing about
+
+A few choices were made on purpose and are worth explaining rather than hiding:
+
+- Whether a school requires the CSS Profile isn't published anywhere as structured data, so this is inferred from whether a school is public or private. It's a reasonable proxy, not a verified fact for every school.
+- The width of the simulated range (how much uncertainty to apply) is a reasoned estimate, not something calibrated against real award letter data, since that data isn't public. The center of each estimate is real; the spread around it is a modeling choice.
+- Schools without enough published net price data are left out of the list entirely rather than filled in with a guess. A shorter, honest list was chosen over a longer one with invented numbers.
+
+## Tech stack
+
+- **Backend:** Python, FastAPI, NumPy, pandas
+- **Frontend:** React, Vite
+- **Data:** College Scorecard API (US Department of Education)
+- **Testing:** pytest
+- **CI:** GitHub Actions, running the test suite and frontend build on every push
+- **Hosting:** Vercel
+
+## Live demo
+
+Frontend: [add your live URL here]
+Backend API: [add your live URL here]
+
+## Running it locally
+
+**Backend**
+
 ```
-#### 2. Run Simulation:
-python scripts/plot_results.py
+python -m venv venv
+venv\Scripts\activate        # Windows
+source venv/bin/activate     # macOS/Linux
 
-#### 3. Run Test:
-pytest
+pip install -r requirements.txt
+uvicorn src.main:app --reload
+```
+
+**Frontend**
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Copy `.env.example` to `.env` in both the project root and `frontend/` and fill in the values described in each file.
+
+## Rebuilding the dataset
+
+`colleges.csv` is generated from the College Scorecard API, not hand maintained. To refresh it with the latest published data:
+
+```
+python -m src.build_college_dataset
+```
+
+This requires a free API key from api.data.gov, set as `COLLEGE_SCORECARD_API_KEY` in `.env`.
+
+## Testing
+
+```
+pytest src/
+```
+
+## What's next
+
+The uncertainty ranges are currently a reasoned estimate rather than something calibrated against real award data, since that data isn't publicly available. If a source for it ever surfaces, that's the next thing worth improving.
