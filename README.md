@@ -1,5 +1,7 @@
 # Wonder
 
+**Live demo:** [Frontend](https://wonder-financial-aid.vercel.app) | [Backend API](https://wonder-alpha-three.vercel.app/api/colleges)
+
 Wonder estimates what a family will actually pay for college, and how much that estimate could vary, for over 1,700 US schools.
 
 ![Wonder demo: comparing estimated cost ranges across multiple colleges](./screenshots/WonderImage.png)
@@ -48,11 +50,6 @@ A few choices were made on purpose and are worth explaining rather than hiding:
 - **Testing:** pytest
 - **CI:** GitHub Actions, running the test suite and frontend build on every push
 - **Hosting:** Vercel
-
-## Live demo
-
-Frontend: https://wonder-financial-aid.vercel.app
-Backend API: https://wonder-alpha-three.vercel.app/api/colleges
 
 ## Running it locally
 
