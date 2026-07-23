@@ -2,6 +2,8 @@
 
 Wonder estimates what a family will actually pay for college, and how much that estimate could vary, for over 1,700 US schools.
 
+![Wonder demo: comparing estimated cost ranges across multiple colleges](./screenshots/WonderImage.png)
+
 ## The problem
 
 Every college publishes its own net price calculator, and every one of them asks for the same financial information. Applying to ten schools means filling out ten forms with the same numbers, and each school comes back with a different answer because they use different methods to calculate aid. The CSS Profile and the FAFSA don't agree with each other, and neither one tells you what a specific school will actually offer.
