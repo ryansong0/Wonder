@@ -75,6 +75,7 @@ class MonteCarloEngine:
             average_net_price = np.mean(total_net_price),
             net_price_percentile_05 = np.percentile(total_net_price, 5),
             net_price_percentile_95 = np.percentile(total_net_price, 95),
+            all_net_price_trials = total_net_price,
         )
 
     def real_net_price_estimate(self, college: CollegeData, household_income: float) -> float | None:

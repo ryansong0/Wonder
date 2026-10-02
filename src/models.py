@@ -24,3 +24,6 @@ class SimulationResult(BaseModel):
     average_net_price: float = 0.0
     net_price_percentile_05: float = 0.0
     net_price_percentile_95: float = 0.0
+    # Per-trial total net price, the cost counterpart to all_trial_results
+    # (which holds per-trial shortfall). Lets callers compute any percentile.
+    all_net_price_trials: np.ndarray | None = None
