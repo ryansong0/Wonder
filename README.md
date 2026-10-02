@@ -36,7 +36,7 @@ Wherever possible, the numbers driving all of this come from the College Scoreca
 
 A few choices were made on purpose and are worth explaining rather than hiding:
 
-- Whether a school requires the CSS Profile isn't published anywhere as structured data, so this is inferred from whether a school is public or private. It's a reasonable proxy, not a verified fact for every school.
+- Whether a school requires the CSS Profile isn't published anywhere as structured data, so this is inferred from ownership: private nonprofits are treated as CSS Profile schools, while public and for-profit schools are treated as federal-only. It's a reasonable proxy, not a verified fact for every school.
 - The width of the simulated range (how much uncertainty to apply) is a reasoned estimate, not something calibrated against real award letter data, since that data isn't public. The center of each estimate is real; the spread around it is a modeling choice.
 - Schools without enough published net price data are left out of the list entirely rather than filled in with a guess. A shorter, honest list was chosen over a longer one with invented numbers.
 - Liquid assets (savings, checking, taxable investments, not a home or retirement accounts) raise the estimate using the same assessment rate the federal aid formula publishes, capped at the school's actual full price so nobody is modeled as paying more than sticker price. Excluding home equity and retirement matches what the federal formula itself excludes, though it also means the broader set of assets CSS Profile schools sometimes weigh, like home equity, isn't captured.

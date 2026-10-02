@@ -46,6 +46,21 @@ def test_private_school_reads_from_private_brackets():
     assert row["net_price_0_30k"] == 9000
 
 
+def test_for_profit_school_reads_private_brackets_but_is_not_css_profile():
+    record = _record(
+        ownership = 3,
+        **{
+            "latest.cost.net_price.private.by_income_level.0-30000": 15000,
+            "latest.cost.net_price.private.by_income_level.30001-48000": 16000,
+        },
+    )
+
+    row = record_to_row(record)
+
+    assert row["requires_css_profile"] is False
+    assert row["net_price_0_30k"] == 15000
+
+
 def test_negative_net_price_is_clipped_to_zero():
     record = _record(
         ownership = 1,

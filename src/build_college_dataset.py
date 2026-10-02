@@ -114,12 +114,12 @@ def record_to_row(record: dict) -> dict | None:
         "state": record.get("school.state"),
         "cost_of_attendance": coa,
         "out_of_state_tuition_premium": out_of_state_premium,
-        # Scorecard doesn't report which aid methodology a school uses. This
-        # is the same ownership-based proxy used for the original hand-picked
-        # list: private institutions (nonprofit or for-profit) skew toward
-        # CSS Profile / institutional methodology, public toward federal-only.
-        # It's a heuristic, not a verified per-school fact.
-        "requires_css_profile": sector == "private",
+        # Scorecard doesn't report which aid methodology a school uses, so
+        # this is an ownership-based proxy: private nonprofits skew toward CSS
+        # Profile / institutional methodology. Public schools and for-profits
+        # overwhelmingly use the federal formula only. It's a heuristic, not a
+        # verified per-school fact.
+        "requires_css_profile": record.get("school.ownership") == 2,
         **brackets,
     }
 
