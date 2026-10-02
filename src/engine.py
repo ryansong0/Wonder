@@ -1,6 +1,6 @@
 import numpy as np
 import functools
-from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_RETURN_MIN, MARKET_RETURN_MAX, INFLATION_MIN, INFLATION_MAX, EFC_SIGMA_CSS_PROFILE, EFC_SIGMA_FEDERAL_ONLY, ASSET_ASSESSMENT_RATE
+from src.config import NUM_TRIALS, YEARS_OF_COLLEGE, MARKET_LOG_RETURN_MEAN, MARKET_LOG_RETURN_VOLATILITY, INFLATION_MIN, INFLATION_MAX, EFC_SIGMA_CSS_PROFILE, EFC_SIGMA_FEDERAL_ONLY, ASSET_ASSESSMENT_RATE
 # rules for input data format
 from src.schemas import CollegeData, StudentProfile
 # rules for final output
@@ -24,8 +24,7 @@ class MonteCarloEngine:
         self.run_simulation = functools.lru_cache(maxsize = 128)(self._run_simulation)
 
     def _run_simulation(self, college: CollegeData, student: StudentProfile) -> SimulationResult:
-        mu, sigma = 0.07, 0.15
-        log_returns = np.random.normal(mu, sigma, (self.trials, YEARS_OF_COLLEGE))
+        log_returns = np.random.normal(MARKET_LOG_RETURN_MEAN, MARKET_LOG_RETURN_VOLATILITY, (self.trials, YEARS_OF_COLLEGE))
         market_returns = np.exp(log_returns) - 1
 
         inflation_rates = np.random.uniform(INFLATION_MIN, INFLATION_MAX, (self.trials, YEARS_OF_COLLEGE))

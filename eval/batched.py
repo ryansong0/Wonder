@@ -10,14 +10,11 @@ import random
 
 import numpy as np
 
-from src import config
-from src.config import ASSET_ASSESSMENT_RATE, EFC_SIGMA_CSS_PROFILE, EFC_SIGMA_FEDERAL_ONLY, INFLATION_MAX, INFLATION_MIN, YEARS_OF_COLLEGE
+from src.config import (
+    ASSET_ASSESSMENT_RATE, EFC_SIGMA_CSS_PROFILE, EFC_SIGMA_FEDERAL_ONLY, INFLATION_MAX, INFLATION_MIN,
+    MARKET_LOG_RETURN_MEAN as MARKET_LOG_MEAN, MARKET_LOG_RETURN_VOLATILITY as MARKET_LOG_SIGMA, YEARS_OF_COLLEGE,
+)
 from src.engine import MonteCarloEngine
-
-# Log-return parameters. Before the market-return fix these were literals
-# inside _run_simulation (0.07, 0.15); afterwards they live in config.
-MARKET_LOG_MEAN = getattr(config, "MARKET_LOG_RETURN_MEAN", 0.07)
-MARKET_LOG_SIGMA = getattr(config, "MARKET_LOG_RETURN_VOLATILITY", 0.15)
 
 
 def point_estimates(colleges, student) -> tuple[np.ndarray, np.ndarray, np.ndarray]:

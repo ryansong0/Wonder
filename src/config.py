@@ -14,8 +14,11 @@ NUM_TRIALS = config['simulation'].get('trials', 1000)
 YEARS_OF_COLLEGE = config['simulation'].get('years_of_college', 4)
 
 # Financial Projections
-MARKET_RETURN_MIN = config['simulation'].get('market_return_min', 0.04)
-MARKET_RETURN_MAX = config['simulation'].get('market_return_max', 0.08)
+# Annual log returns on liquid assets are drawn from a normal distribution with
+# this mean and standard deviation (i.e. returns are lognormal). These only
+# affect the shortfall outputs, not the net price estimate.
+MARKET_LOG_RETURN_MEAN = config['simulation'].get('market_log_return_mean', 0.07)
+MARKET_LOG_RETURN_VOLATILITY = config['simulation'].get('market_log_return_volatility', 0.15)
 
 INFLATION_MIN = config['simulation'].get('inflation_min', 0.02)
 INFLATION_MAX = config['simulation'].get('inflation_max', 0.05)
