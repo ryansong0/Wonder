@@ -1,7 +1,11 @@
 import logging
 from src.loader import load_college_data
-from src.schemas import CollegeData
+from src.schemas import StudentProfile
 from src.engine import MonteCarloEngine
+
+# A single representative household, since run_simulation needs a student
+# profile to center each school's estimate on.
+SAMPLE_STUDENT = StudentProfile(household_income = 85000, liquid_assets = 40000, family_size = 4, state_of_residence = "NY")
 
 def main():
     # initialize logger
@@ -19,7 +23,7 @@ def main():
         print(f"An unexpected error occurred while loading data. Check 'simulation.log' for details.")
         return
     
-    logging.info(f"Loaded {len(college_list)} colleges succesffully.")
+    logging.info(f"Loaded {len(college_list)} colleges successfully.")
     logging.info("Starting simulation...")
 
     engine = MonteCarloEngine(trials = 1000)
@@ -28,7 +32,7 @@ def main():
     print("-" * 60)
 
     for college in college_list:
-        result = engine.run_simulation(college)
+        result = engine.run_simulation(college, SAMPLE_STUDENT)
         print(f"{result.college_name:<30} | {result.probability_of_shortfall * 100:>13.1f}% | ${result.average_total_cost:>12,.2f}")
 
     logging.info("Simulation completed.")
