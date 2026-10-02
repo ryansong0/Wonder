@@ -42,6 +42,24 @@ A few choices were made on purpose and are worth explaining rather than hiding:
 - Liquid assets (savings, checking, taxable investments, not a home or retirement accounts) raise the estimate using the same assessment rate the federal aid formula publishes, capped at the school's actual full price so nobody is modeled as paying more than sticker price. Excluding home equity and retirement matches what the federal formula itself excludes, though it also means the broader set of assets CSS Profile schools sometimes weigh, like home equity, isn't captured.
 - Family size is collected but currently has no effect on the estimate. The real reason it should matter, a federal allowance that protects more income for larger families, doesn't have a clean equivalent in this model, since net price comes from real published data keyed only by income, not from a formula this project computes itself. Rather than invent a number for it, it's left unused and disclosed here.
 
+## Evaluation
+
+Because each school's published net price is the input that centers its simulation, checking whether that same number lands inside the simulated range would prove nothing. The evaluation instead hides the number being predicted. It removes one income bracket at a time and predicts it from the others, and separately it forecasts this year's published prices from older releases. Full tables, the circular sanity check, and the data quality breakdown are in [eval/RESULTS.md](eval/RESULTS.md).
+
+| Metric (1,000 scenarios per school, fixed seed) | Result |
+|---|---|
+| Hidden bracket inside the simulated p10-p90 range (target 80%) | 73.3% of 8,062 brackets across 1,643 schools |
+| Same, for brackets between two reported ones | 79.4% |
+| Same, CSS Profile vs federal-only schools | 85.0% vs 54.4% |
+| Mean absolute error of the simulated median | $2,528 per year (12.5% weighted) |
+| 1-year forecast inside p10-p90 (2023 data, scored on 2024) | 70.3% |
+| Raw Scorecard records excluded for missing data | 240 of 1,944 (12.3%) |
+| Kept schools with a missing or inconsistent field | 990 of 1,704 (58.1%) |
+| 1,000 scenarios for one school / all 1,704 schools | 1.9 ms / 3.7 s |
+| NumPy engine vs a pure-Python loop / batching all schools vs per-school calls | 6.6x / 2.5x faster |
+
+What this shows: the range is about right for CSS Profile schools, too narrow for federal-only schools, and noticeably off at the edges of the published data, most of all for incomes above $110k at schools that don't report that bracket.
+
 ## Tech stack
 
 - **Backend:** Python, FastAPI, NumPy, pandas

@@ -154,7 +154,7 @@ def performance_section(runs) -> str:
     m, eq = p["machine"], p["batched_equivalence_check"]
     return "\n\n".join([
         f"1,000 scenarios per school, student: {p['student']}. Median of repeated runs.",
-        table(["Run", "Workload", "Engine (as shipped)", "Pure Python loop", "Batched NumPy", "Engine vs pure Python", "Batched vs engine"], rows),
+        table(["Run", "Workload", "Engine", "Pure Python loop", "Batched NumPy", "Engine vs pure Python", "Batched vs engine"], rows),
         f"The batched version was checked against the engine draw-for-draw on all {eq['schools_compared']:,} schools: "
         f"max relative difference {eq['max_relative_difference']:.1e}.",
         f"Machine: {m['processor']}, {m['logical_cpus']} logical CPUs, {m['platform']}, Python {m['python']}, NumPy {m['numpy']}. "

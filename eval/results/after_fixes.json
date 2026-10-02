@@ -1,0 +1,447 @@
+{
+  "label": "after_fixes",
+  "run_on": "2026-10-02",
+  "git_commit": "b965c70",
+  "seed": 20261001,
+  "data_quality": {
+    "raw_fetched_on": "2026-10-02",
+    "ingestion": {
+      "raw_records": 1944,
+      "kept": 1704,
+      "excluded": 240,
+      "excluded_pct": 12.35,
+      "exclusion_reasons": {
+        "missing cost of attendance": {
+          "count": 183,
+          "pct_of_raw": 9.41
+        },
+        "only 1 net-price bracket(s)": {
+          "count": 56,
+          "pct_of_raw": 2.88
+        },
+        "only 0 net-price bracket(s)": {
+          "count": 1,
+          "pct_of_raw": 0.05
+        }
+      },
+      "kept_with_negative_net_price_clipped_to_0": 11,
+      "negative_net_price_values_clipped": 16,
+      "kept_with_out_of_state_below_in_state_tuition": 0,
+      "missing_ownership_raw": 0
+    },
+    "kept_dataset": {
+      "schools": 1704,
+      "bracket_count_distribution": {
+        "2": 50,
+        "3": 56,
+        "4": 96,
+        "5": 1502
+      },
+      "schools_with_any_issue": 990,
+      "schools_with_any_issue_pct": 58.1,
+      "missing_by_column": {
+        "net_price_0_30k": 22,
+        "net_price_30k_48k": 36,
+        "net_price_48k_75k": 52,
+        "net_price_75k_110k": 94,
+        "net_price_110k_plus": 154
+      },
+      "issues": [
+        {
+          "issue": "Missing at least one income bracket",
+          "count": 202,
+          "pct": 11.85,
+          "handling": "Kept if >= 2 brackets; engine interpolates between the reported brackets (np.interp)."
+        },
+        {
+          "issue": "Missing the 110k+ bracket",
+          "count": 154,
+          "pct": 9.04,
+          "handling": "np.interp holds the 75-110k value flat for all higher incomes (likely understates cost)."
+        },
+        {
+          "issue": "Missing the 0-30k bracket",
+          "count": 22,
+          "pct": 1.29,
+          "handling": "np.interp holds the lowest reported bracket flat for lower incomes."
+        },
+        {
+          "issue": "Net price falls as income rises (any drop)",
+          "count": 861,
+          "pct": 50.53,
+          "handling": "Not handled; interpolated as-is."
+        },
+        {
+          "issue": "Net price falls >10% as income rises",
+          "count": 355,
+          "pct": 20.83,
+          "handling": "Not handled; interpolated as-is."
+        },
+        {
+          "issue": "A bracket reported as exactly $0",
+          "count": 13,
+          "pct": 0.76,
+          "handling": "Kept; negative raw values were clipped to 0 at build time."
+        },
+        {
+          "issue": "A bracket above cost of attendance",
+          "count": 0,
+          "pct": 0.0,
+          "handling": "Engine caps the point estimate at cost of attendance."
+        },
+        {
+          "issue": "School in a territory (PR, GU, VI)",
+          "count": 34,
+          "pct": 2.0,
+          "handling": "No student can match its state (StudentProfile rejects territories), so the out-of-state premium is always added; it is $0 for all but public schools."
+        },
+        {
+          "issue": "Missing out-of-state tuition premium",
+          "count": 0,
+          "pct": 0.0,
+          "handling": "Treated as no premium."
+        }
+      ],
+      "requires_css_profile_true": 1062
+    },
+    "ownership_of_kept_schools": {
+      "public": 562,
+      "private for-profit": 80,
+      "private nonprofit": 1062
+    }
+  },
+  "validation": {
+    "trials_per_simulation": 1000,
+    "student": "in-state, $0 liquid assets, income = bracket midpoint",
+    "leave_one_bracket_out": {
+      "schools": 1643,
+      "annual_band": {
+        "n": 8062,
+        "coverage_p10_p90_pct": 73.34,
+        "coverage_p05_p95_pct": 80.46,
+        "below_p10_pct": 11.34,
+        "above_p90_pct": 15.32,
+        "mae_vs_median_usd": 2528.0,
+        "median_abs_error_usd": 1427.0,
+        "bias_median_minus_published_usd": -644.0,
+        "wape_pct": 12.54,
+        "mean_published_usd": 20154.0,
+        "mean_p10_p90_width_usd": 7984.0
+      },
+      "annual_band_by_position": {
+        "edge": {
+          "n": 3308,
+          "coverage_p10_p90_pct": 64.63,
+          "coverage_p05_p95_pct": 72.34,
+          "below_p10_pct": 8.59,
+          "above_p90_pct": 26.78,
+          "mae_vs_median_usd": 3612.0,
+          "median_abs_error_usd": 1996.0,
+          "bias_median_minus_published_usd": -2312.0,
+          "wape_pct": 16.68,
+          "mean_published_usd": 21660.0,
+          "mean_p10_p90_width_usd": 7888.0
+        },
+        "interior": {
+          "n": 4754,
+          "coverage_p10_p90_pct": 79.41,
+          "coverage_p05_p95_pct": 86.12,
+          "below_p10_pct": 13.25,
+          "above_p90_pct": 7.34,
+          "mae_vs_median_usd": 1773.0,
+          "median_abs_error_usd": 1190.0,
+          "bias_median_minus_published_usd": 516.0,
+          "wape_pct": 9.28,
+          "mean_published_usd": 19106.0,
+          "mean_p10_p90_width_usd": 8051.0
+        }
+      },
+      "annual_band_by_methodology": {
+        "CSS label": {
+          "n": 4997,
+          "coverage_p10_p90_pct": 84.99,
+          "coverage_p05_p95_pct": 89.51,
+          "below_p10_pct": 5.14,
+          "above_p90_pct": 9.87,
+          "mae_vs_median_usd": 3030.0,
+          "median_abs_error_usd": 1683.0,
+          "bias_median_minus_published_usd": -771.0,
+          "wape_pct": 13.43,
+          "mean_published_usd": 22562.0,
+          "mean_p10_p90_width_usd": 11148.0
+        },
+        "federal-only label": {
+          "n": 3065,
+          "coverage_p10_p90_pct": 54.36,
+          "coverage_p05_p95_pct": 65.71,
+          "below_p10_pct": 21.44,
+          "above_p90_pct": 24.21,
+          "mae_vs_median_usd": 1709.0,
+          "median_abs_error_usd": 1133.0,
+          "bias_median_minus_published_usd": -438.0,
+          "wape_pct": 10.53,
+          "mean_published_usd": 16228.0,
+          "mean_p10_p90_width_usd": 2826.0
+        }
+      },
+      "annual_band_by_bracket": {
+        "net_price_0_30k": {
+          "n": 1643,
+          "coverage_p10_p90_pct": 77.3,
+          "coverage_p05_p95_pct": 83.32,
+          "below_p10_pct": 15.46,
+          "above_p90_pct": 7.24,
+          "mae_vs_median_usd": 1733.0,
+          "median_abs_error_usd": 1068.0,
+          "bias_median_minus_published_usd": 395.0,
+          "wape_pct": 10.8,
+          "mean_published_usd": 16051.0,
+          "mean_p10_p90_width_usd": 6792.0
+        },
+        "net_price_110k_plus": {
+          "n": 1542,
+          "coverage_p10_p90_pct": 51.17,
+          "coverage_p05_p95_pct": 60.7,
+          "below_p10_pct": 1.69,
+          "above_p90_pct": 47.15,
+          "mae_vs_median_usd": 5651.0,
+          "median_abs_error_usd": 3773.0,
+          "bias_median_minus_published_usd": -5217.0,
+          "wape_pct": 20.3,
+          "mean_published_usd": 27839.0,
+          "mean_p10_p90_width_usd": 9147.0
+        },
+        "net_price_30k_48k": {
+          "n": 1640,
+          "coverage_p10_p90_pct": 75.0,
+          "coverage_p05_p95_pct": 81.95,
+          "below_p10_pct": 22.07,
+          "above_p90_pct": 2.93,
+          "mae_vs_median_usd": 1721.0,
+          "median_abs_error_usd": 1234.0,
+          "bias_median_minus_published_usd": 962.0,
+          "wape_pct": 10.46,
+          "mean_published_usd": 16453.0,
+          "mean_p10_p90_width_usd": 7186.0
+        },
+        "net_price_48k_75k": {
+          "n": 1635,
+          "coverage_p10_p90_pct": 82.87,
+          "coverage_p05_p95_pct": 88.99,
+          "below_p10_pct": 9.36,
+          "above_p90_pct": 7.77,
+          "mae_vs_median_usd": 1546.0,
+          "median_abs_error_usd": 1003.0,
+          "bias_median_minus_published_usd": 243.0,
+          "wape_pct": 8.33,
+          "mean_published_usd": 18570.0,
+          "mean_p10_p90_width_usd": 7695.0
+        },
+        "net_price_75k_110k": {
+          "n": 1602,
+          "coverage_p10_p90_pct": 79.21,
+          "coverage_p05_p95_pct": 86.33,
+          "below_p10_pct": 7.43,
+          "above_p90_pct": 13.36,
+          "mae_vs_median_usd": 2164.0,
+          "median_abs_error_usd": 1384.0,
+          "bias_median_minus_published_usd": 141.0,
+          "wape_pct": 9.68,
+          "mean_published_usd": 22369.0,
+          "mean_p10_p90_width_usd": 9200.0
+        }
+      },
+      "four_year_total_div_4": {
+        "n": 8062,
+        "coverage_p10_p90_pct": 68.46,
+        "coverage_p05_p95_pct": 76.07,
+        "below_p10_pct": 23.65,
+        "above_p90_pct": 7.89,
+        "mae_vs_median_usd": 3010.0,
+        "median_abs_error_usd": 2119.0,
+        "bias_median_minus_published_usd": 1117.0,
+        "wape_pct": 14.93,
+        "mean_published_usd": 20154.0,
+        "mean_p10_p90_width_usd": 8734.0
+      }
+    },
+    "sanity_check_circular": {
+      "note": "Published net price is the simulation's center input; near-full coverage is expected by construction and is NOT evidence of accuracy.",
+      "schools": 1693,
+      "annual_band": {
+        "n": 8162,
+        "coverage_p10_p90_pct": 100.0,
+        "coverage_p05_p95_pct": 100.0,
+        "below_p10_pct": 0.0,
+        "above_p90_pct": 0.0,
+        "mae_vs_median_usd": 100.0,
+        "median_abs_error_usd": 58.0,
+        "bias_median_minus_published_usd": 2.0,
+        "wape_pct": 0.5,
+        "mean_published_usd": 20167.0,
+        "mean_p10_p90_width_usd": 8255.0
+      },
+      "four_year_total_div_4": {
+        "n": 8162,
+        "coverage_p10_p90_pct": 99.18,
+        "coverage_p05_p95_pct": 100.0,
+        "below_p10_pct": 0.82,
+        "above_p90_pct": 0.0,
+        "mae_vs_median_usd": 1829.0,
+        "median_abs_error_usd": 1697.0,
+        "bias_median_minus_published_usd": 1829.0,
+        "wape_pct": 9.07,
+        "mean_published_usd": 20167.0,
+        "mean_p10_p90_width_usd": 9027.0
+      }
+    },
+    "time_holdout": {
+      "2023": {
+        "base_year": 2023,
+        "target_year": 2024,
+        "horizon_years": 1,
+        "schools": 1653,
+        "forecast_band": {
+          "n": 8041,
+          "coverage_p10_p90_pct": 70.31,
+          "coverage_p05_p95_pct": 77.29,
+          "below_p10_pct": 18.14,
+          "above_p90_pct": 11.54,
+          "mae_vs_median_usd": 2663.0,
+          "median_abs_error_usd": 1758.0,
+          "bias_median_minus_published_usd": 641.0,
+          "wape_pct": 13.25,
+          "mean_published_usd": 20099.0,
+          "mean_p10_p90_width_usd": 8520.0
+        },
+        "forecast_band_by_methodology": {
+          "CSS label": {
+            "n": 4988,
+            "coverage_p10_p90_pct": 81.48,
+            "coverage_p05_p95_pct": 87.13,
+            "below_p10_pct": 9.18,
+            "above_p90_pct": 9.34,
+            "mae_vs_median_usd": 3170.0,
+            "median_abs_error_usd": 2191.0,
+            "bias_median_minus_published_usd": 672.0,
+            "wape_pct": 14.06,
+            "mean_published_usd": 22538.0,
+            "mean_p10_p90_width_usd": 11889.0
+          },
+          "federal-only label": {
+            "n": 3053,
+            "coverage_p10_p90_pct": 52.08,
+            "coverage_p05_p95_pct": 61.22,
+            "below_p10_pct": 32.79,
+            "above_p90_pct": 15.13,
+            "mae_vs_median_usd": 1837.0,
+            "median_abs_error_usd": 1270.0,
+            "bias_median_minus_published_usd": 591.0,
+            "wape_pct": 11.4,
+            "mean_published_usd": 16114.0,
+            "mean_p10_p90_width_usd": 3015.0
+          }
+        },
+        "persistence_baseline": {
+          "mae_usd": 2546.0,
+          "median_abs_error_usd": 1630.0,
+          "bias_usd": -57.0,
+          "wape_pct": 12.67
+        }
+      },
+      "2021": {
+        "base_year": 2021,
+        "target_year": 2024,
+        "horizon_years": 3,
+        "schools": 1620,
+        "forecast_band": {
+          "n": 7884,
+          "coverage_p10_p90_pct": 58.26,
+          "coverage_p05_p95_pct": 67.01,
+          "below_p10_pct": 28.41,
+          "above_p90_pct": 13.33,
+          "mae_vs_median_usd": 3776.0,
+          "median_abs_error_usd": 2765.0,
+          "bias_median_minus_published_usd": 1307.0,
+          "wape_pct": 18.81,
+          "mean_published_usd": 20072.0,
+          "mean_p10_p90_width_usd": 8898.0
+        },
+        "forecast_band_by_methodology": {
+          "CSS label": {
+            "n": 4987,
+            "coverage_p10_p90_pct": 72.81,
+            "coverage_p05_p95_pct": 81.41,
+            "below_p10_pct": 15.86,
+            "above_p90_pct": 11.33,
+            "mae_vs_median_usd": 4346.0,
+            "median_abs_error_usd": 3236.0,
+            "bias_median_minus_published_usd": 1350.0,
+            "wape_pct": 19.3,
+            "mean_published_usd": 22521.0,
+            "mean_p10_p90_width_usd": 12251.0
+          },
+          "federal-only label": {
+            "n": 2897,
+            "coverage_p10_p90_pct": 33.21,
+            "coverage_p05_p95_pct": 42.22,
+            "below_p10_pct": 50.02,
+            "above_p90_pct": 16.78,
+            "mae_vs_median_usd": 2794.0,
+            "median_abs_error_usd": 2198.0,
+            "bias_median_minus_published_usd": 1232.0,
+            "wape_pct": 17.62,
+            "mean_published_usd": 15856.0,
+            "mean_p10_p90_width_usd": 3126.0
+          }
+        },
+        "persistence_baseline": {
+          "mae_usd": 3473.0,
+          "median_abs_error_usd": 2346.0,
+          "bias_usd": -784.0,
+          "wape_pct": 17.3
+        }
+      }
+    }
+  },
+  "performance": {
+    "machine": {
+      "platform": "Windows-11-10.0.26200-SP0",
+      "processor": "Intel64 Family 6 Model 181 Stepping 0, GenuineIntel",
+      "logical_cpus": 14,
+      "python": "3.14.2",
+      "numpy": "2.4.6"
+    },
+    "trials_per_school": 1000,
+    "schools": 1704,
+    "student": "income $85,000, liquid assets $40,000, NY resident",
+    "batched_equivalence_check": {
+      "schools_compared": 1704,
+      "max_relative_difference": 0.0,
+      "matches": true
+    },
+    "one_school": {
+      "engine_ms": 1.887,
+      "engine_best_ms": 1.686,
+      "engine_result_construction_ms": 0.008,
+      "pure_python_ms": 13.058,
+      "batched_numpy_ms": 1.543,
+      "batched_numpy_best_ms": 1.264,
+      "speedup_engine_vs_pure_python": 6.9
+    },
+    "all_schools": {
+      "engine_loop_s": 3.664,
+      "engine_loop_best_s": 3.611,
+      "pure_python_s": 24.045,
+      "batched_numpy_s": 1.491,
+      "batched_numpy_best_s": 1.418,
+      "engine_loop_per_school_ms": 2.1501,
+      "batched_per_school_ms": 0.8751,
+      "speedup_engine_vs_pure_python": 6.6,
+      "speedup_batched_vs_engine_loop": 2.5,
+      "speedup_batched_vs_pure_python": 16.1,
+      "scenarios_per_second_engine_loop": 465095,
+      "scenarios_per_second_batched": 1142669
+    }
+  }
+}
